@@ -1,10 +1,10 @@
 <?php
 
 /**
-* ogscalc.php - Fichier de mise à jour
+* ogscalc.php - Fichier de mise Ã  jour
 * @package Calculatrice universelle
 * @author Aeris
-* @update xaviernuma - 2012
+* @update xaviernuma - 2015
 * @link http://www.ogsteam.fr/
 **/
 

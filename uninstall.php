@@ -1,10 +1,10 @@
 <?php
 
 /**
-* ogscalc.php - Fichier de désinstallation
+* ogscalc.php - Fichier de dÃ©sinstallation
 * @package Calculatrice universelle
 * @author Aeris
-* @update xaviernuma - 2012
+* @update xaviernuma - 2015
 * @link http://www.ogsteam.fr/
 **/
 
@@ -18,4 +18,5 @@ global $db, $table_prefix;
 $mod_uninstall_name  = 'OGSCalc'; 
  
 uninstall_mod ($mod_uninstall_name, $mod_uninstall_table);
+
 ?>

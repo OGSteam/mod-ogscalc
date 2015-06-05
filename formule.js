@@ -456,7 +456,7 @@ function sauvegarde ()
 	}
 	
 	writeCookie("data", save, date);
-	alert('Données sauvegardées');
+	alert('DonnÃ©es sauvegardÃ©es');
 }
 
 function restaure ()
@@ -476,7 +476,7 @@ function restaure ()
 		temp = save[i].split("%3E");
 		document.getElementById(temp[0]).value = temp[1];
 	}
-	alert('Données restaurées');
+	alert('DonnÃ©es restaurÃ©es');
 }
 
 function resetType(array)
@@ -618,7 +618,7 @@ function calcul_transports(arr)
 	// return sRes;
 // }
 
-// Fonction qui charge les données à chaque changement dans le menu déroulant.
+// Fonction qui charge les donnÃ©es Ã  chaque changement dans le menu dÃ©roulant.
 function chargement(id_planete)
 {
 	f_reset_donnees();
@@ -663,7 +663,7 @@ function f_number_format(valeur)
 {
 	var decimal = 0;
 	var separateur = ' ';
-	// formate un chiffre avec 'decimal' chiffres après la virgule et un separateur
+	// formate un chiffre avec 'decimal' chiffres aprÃ¨s la virgule et un separateur
 	var deci=Math.round( Math.pow(10,decimal)*(Math.abs(valeur)-Math.floor(Math.abs(valeur)))) ; 
 	var val=Math.floor(Math.abs(valeur));
 	if ((decimal==0)||(deci==Math.pow(10,decimal))) {val=Math.floor(Math.abs(valeur)); deci=0;}

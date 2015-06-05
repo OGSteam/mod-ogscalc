@@ -4,7 +4,7 @@
 * install.php - Fichier d'installation
 * @package Calculatrice universelle
 * @author Aeris
-* @update xaviernuma - 2012
+* @update xaviernuma - 2015
 * @link http://www.ogsteam.fr/
 **/
 
@@ -17,11 +17,11 @@ $mod_folder = 'ogscalc';
 
 if (install_mod($mod_folder)) 
 {
-	// Si besoin de créer des tables, à faire ici
+	// Si besoin de crÃ©er des tables, Ã  faire ici
 }
 else 
 {
-	echo '<script>alert(\'Un problème a eu lieu pendant l\\\'installation du mod, corrigez les problèmes survenus et réessayez.\');</script>';
+	echo '<script>alert(\'Un problÃ¨me a eu lieu pendant l\\\'installation du mod, corrigez les problÃ¨mes survenus et rÃ©essayez.\');</script>';
 }
 
 ?>

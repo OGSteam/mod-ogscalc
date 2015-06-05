@@ -4,7 +4,7 @@
 * ogscalc.php - Programme principal
 * @package Calculatrice universelle
 * @author Aeris
-* @update xaviernuma - 2012
+* @update xaviernuma - 2015
 * @link http://www.ogsteam.fr/
 **/
 
@@ -22,7 +22,7 @@ $ta_resultat = $db->sql_query('SELECT `version`, `root` FROM `'.TABLE_MOD.'` WHE
 
 if(!$db->sql_numrows($ta_resultat))
 {
-	die('Mod désactivé !');
+	die('Mod dÃ©sactivÃ© !');
 }
 
 list ( $mod_version, $mod_root ) = $db->sql_fetch_row($ta_resultat);
@@ -99,7 +99,7 @@ $s_html .= '</script>';
 $s_html .= 		'<input type="hidden" value="mod/'.$mod_root.'/" id="root" />';
 $s_html .= 		'<table>';
 $s_html .= 			'<tr>';
-$s_html .= 				'<td class="c" style="text-align:center">Planète de développement :</td><th>';
+$s_html .= 				'<td class="c" style="text-align:center">PlanÃ¨te de dÃ©veloppement :</td><th>';
 $s_html .= 					'<select id="planete" onchange="javascript:chargement(this.options[this.selectedIndex].value);">';
 
 $i = 0;
@@ -128,7 +128,7 @@ $s_html .= 			'</tr><tr>';
 $s_html .= 				'<td class="c" style="text-align:center">Usine de robot :</td><th><input type="text" id="robot" size="2" maxlength="2" value="'.$ta_premiere_planete['UdR'].'" onkeyup="javascript:rafraichiRobot()"></th>';
 $s_html .= 				'<td class="c" style="text-align:center">Usine de nanites :</td><th><input type="text" id="nanite" size="2" maxlength="2" value="'.$ta_premiere_planete['UdN'].'" onkeyup="javascript:rafraichiRobot();rafraichiChantier()"></th>';
 $s_html .= 			'</tr><tr>';
-$s_html .= 				'<td class="c" style="text-align:center">Réseau de recherche intergalactique :</td><th><input type="text" id="reseau" size="2" maxlength="2" value="'.$user_technology['RRI'].'" onkeyup="javascript:laboEqui()"></th>';
+$s_html .= 				'<td class="c" style="text-align:center">RÃ©seau de recherche intergalactique :</td><th><input type="text" id="reseau" size="2" maxlength="2" value="'.$user_technology['RRI'].'" onkeyup="javascript:laboEqui()"></th>';
 $i = 0;
 $n_laboratoire_equivalent = 0;
 $t_labo = Array();
@@ -157,7 +157,7 @@ foreach($t_labo as $n_un_labo)
 	}
 }
 
-$s_html .= 				'<td class="c" style="text-align:center">Laboratoire équivalent :</td><th><input type="text" id="laboequi" size="4" maxlength="2" readonly value="'.$n_laboratoire_equivalent.'"></th>';
+$s_html .= 				'<td class="c" style="text-align:center">Laboratoire Ã©quivalent :</td><th><input type="text" id="laboequi" size="4" maxlength="2" readonly value="'.$n_laboratoire_equivalent.'"></th>';
 $s_html .= 			'</tr>';
 $s_html .= 		'</table>';
 $s_html .= 		'</div>';
@@ -168,10 +168,10 @@ $s_html .= 		'<legend><img src="mod/'.$mod_root.'/moins.png" style="cursor:point
 $s_html .= 		'<div id="deroulant_total" style="display:block;">';
 $s_html .= 		'<table>';
 $s_html .= 			'<tr><td class="c" style="text-align:center">';
-$s_html .= 				'Métal requis</td><td class="c" style="text-align:center">';
+$s_html .= 				'MÃ©tal requis</td><td class="c" style="text-align:center">';
 $s_html .= 				'Cristal requis</td><td class="c" style="text-align:center">';
-$s_html .= 				'Deutérium requis</td><td class="c" style="text-align:center">';
-$s_html .= 				'Durée de construction</td>';
+$s_html .= 				'DeutÃ©rium requis</td><td class="c" style="text-align:center">';
+$s_html .= 				'DurÃ©e de construction</td>';
 $s_html .= 				'</tr>';
 $s_html .= 			'<tr><th>';
 $s_html .= 				'<input type="hidden" id="total_metal" value="0" /><input type="text" id="total_metal_resultat" size="15" readonly value="0" /></th><th>';
@@ -189,22 +189,22 @@ $s_html .= 		'</table>';
 $s_html .= 		'</div>';
 $s_html .= '</fieldset>';
 
-// Bâtiments
+// BÃ¢timents
 
 $s_html_batiments = '';
 
 // 0 = parametre ; 1 = lettre ; 2 = code ; 3 = nom
-$ta_batiments[0] = Array ('60, 15, 0, 1.5', 'M', 'mine_metal', 'Mine de métal');
+$ta_batiments[0] = Array ('60, 15, 0, 1.5', 'M', 'mine_metal', 'Mine de mÃ©tal');
 $ta_batiments[1] = Array ('48,24,0,1.6', 'C', 'mine_cristal', 'Mine de cristal');
-$ta_batiments[2] = Array ('225,75,0,1.5', 'D', 'synthetiseur_deuterium', 'Synthétiseur de deutérium');
-$ta_batiments[3] = Array ('75,30,0,1.5', 'CES', 'centrale_solaire', 'Centrale électrique solaire');
-$ta_batiments[4] = Array ('900,360,180,1.8', 'CEF', 'reacteur_fusion', 'Centrale électrique de fusion');
-$ta_batiments[5] = Array ('1000,0,0,2', 'HM', 'hangar_metal', 'Hangar de métal');
+$ta_batiments[2] = Array ('225,75,0,1.5', 'D', 'synthetiseur_deuterium', 'SynthÃ©tiseur de deutÃ©rium');
+$ta_batiments[3] = Array ('75,30,0,1.5', 'CES', 'centrale_solaire', 'Centrale Ã©lectrique solaire');
+$ta_batiments[4] = Array ('900,360,180,1.8', 'CEF', 'reacteur_fusion', 'Centrale Ã©lectrique de fusion');
+$ta_batiments[5] = Array ('1000,0,0,2', 'HM', 'hangar_metal', 'Hangar de mÃ©tal');
 $ta_batiments[6] = Array ('1000,500,0,2', 'HC', 'hangar_cristal', 'Hangar de cristal');
-$ta_batiments[7] = Array ('1000,1000,0,2', 'HD', 'reservoir_deuterium', 'Réservoir de deutérium');
-$ta_batiments[8] = Array ('2645,0,0,2', 'CM', 'cachette_metal', 'Cachette de métal camouflée');
+$ta_batiments[7] = Array ('1000,1000,0,2', 'HD', 'reservoir_deuterium', 'RÃ©servoir de deutÃ©rium');
+$ta_batiments[8] = Array ('2645,0,0,2', 'CM', 'cachette_metal', 'Cachette de mÃ©tal camouflÃ©e');
 $ta_batiments[9] = Array ('2645,1322,0,2', 'CC', 'cachette_cristal', 'Cachette de cristal souterraine');
-$ta_batiments[10] = Array ('2645,2645,0,2', 'CD', 'cachette_deuterium', 'Cachette de deutérium sous-marine');
+$ta_batiments[10] = Array ('2645,2645,0,2', 'CD', 'cachette_deuterium', 'Cachette de deutÃ©rium sous-marine');
 $ta_batiments[11] = Array ('400,120,200,2', 'UdR', 'usine_robots', 'Usine de robots');
 $ta_batiments[12] = Array ('1000000,500000,100000,2', 'UdN', 'usine_nanites', 'Usine de nanites');
 $ta_batiments[13] = Array ('400,200,100,2', 'CSp', 'chantier_spatial', 'Chantier spatial');
@@ -227,17 +227,17 @@ for($i = 0 ; $i < count($ta_batiments) ; $i++)
 }
 
 $s_html .= '<fieldset>';
-$s_html .= 		'<legend><img src="mod/'.$mod_root.'/moins.png" style="cursor:pointer;" alt="moins" onclick="javascript:f_inverse(\'deroulant_batiment\', this)" /> Bâtiments</legend>';
+$s_html .= 		'<legend><img src="mod/'.$mod_root.'/moins.png" style="cursor:pointer;" alt="moins" onclick="javascript:f_inverse(\'deroulant_batiment\', this)" /> BÃ¢timents</legend>';
 $s_html .= 		'<div id="deroulant_batiment" style="display:block;">';
 $s_html .= 		'<table>';
 $s_html .= 			'<tr><td class="c" style="text-align:center">';
 $s_html .= 				'Nom</td><td class="c" style="text-align:center">';
 $s_html .= 				'Niveau actuel</td><td class="c" style="text-align:center">';
 $s_html .= 				'Niveau voulu</td><td class="c" style="text-align:center">';
-$s_html .= 				'Métal requis</td><td class="c" style="text-align:center">';
+$s_html .= 				'MÃ©tal requis</td><td class="c" style="text-align:center">';
 $s_html .= 				'Cristal requis</td><td class="c" style="text-align:center">';
-$s_html .= 				'Deutérium requis</td><td class="c" style="text-align:center">';
-$s_html .= 				'Durée de construction</td>';
+$s_html .= 				'DeutÃ©rium requis</td><td class="c" style="text-align:center">';
+$s_html .= 				'DurÃ©e de construction</td>';
 $s_html .= 			'</tr>';
 $s_html .= 			$s_html_batiments;
 $s_html .= 			'<tr><td class="c" style="text-align:center" colspan="3">';
@@ -257,7 +257,7 @@ $s_html .= 		'</table>';
 $s_html .= 		'</div>';
 $s_html .= '</fieldset>';
 
-// Bâtiments spéciaux
+// BÃ¢timents spÃ©ciaux
 
 $s_html_batiments_speciaux = '';
 
@@ -265,7 +265,7 @@ $s_html_batiments_speciaux = '';
 $ta_batiments_speciaux[0] = Array ('20000,40000,20000,2', 'BaLu', 'base_lunaire', 'Base lunaire');
 $ta_batiments_speciaux[1] = Array ('20000,40000,20000,2', 'Pha', 'phalange_capteurs', 'Phalange de capteur');
 $ta_batiments_speciaux[2] = Array ('2000000,4000000,2000000,2', 'PoSa', 'porte_saut_spatial', 'Porte de saut spatial');
-$ta_batiments_speciaux[3] = Array ('20000,40000,0,2', 'DdR', 'depot_ravitaillement', 'Dépôt de ravitaillement');
+$ta_batiments_speciaux[3] = Array ('20000,40000,0,2', 'DdR', 'depot_ravitaillement', 'DÃ©pÃ´t de ravitaillement');
 
 for($i = 0 ; $i < count($ta_batiments_speciaux) ; $i++)
 {
@@ -282,17 +282,17 @@ for($i = 0 ; $i < count($ta_batiments_speciaux) ; $i++)
 }
 
 $s_html .= '<fieldset>';
-$s_html .= 		'<legend><img src="mod/'.$mod_root.'/moins.png" style="cursor:pointer;" alt="moins" onclick="javascript:f_inverse(\'deroulant_speciaux\', this)" /> Bâtiments spéciaux</legend>';
+$s_html .= 		'<legend><img src="mod/'.$mod_root.'/moins.png" style="cursor:pointer;" alt="moins" onclick="javascript:f_inverse(\'deroulant_speciaux\', this)" /> BÃ¢timents spÃ©ciaux</legend>';
 $s_html .= 		'<div id="deroulant_speciaux" style="display:block;">';
 $s_html .=		'<table>';
 $s_html .= 			'<tr><td class="c" style="text-align:center">';
 $s_html .= 				'Nom</td><td class="c" style="text-align:center">';
 $s_html .= 				'Niveau actuel</td><td class="c" style="text-align:center">';
 $s_html .= 				'Niveau voulu</td><td class="c" style="text-align:center">';
-$s_html .= 				'Métal requis</td><td class="c" style="text-align:center">';
+$s_html .= 				'MÃ©tal requis</td><td class="c" style="text-align:center">';
 $s_html .= 				'Cristal requis</td><td class="c" style="text-align:center">';
-$s_html .= 				'Deutérium requis</td><td class="c" style="text-align:center">';
-$s_html .= 				'Durée de construction</td>';
+$s_html .= 				'DeutÃ©rium requis</td><td class="c" style="text-align:center">';
+$s_html .= 				'DurÃ©e de construction</td>';
 $s_html .= 			'</tr>';
 $s_html .=			$s_html_batiments_speciaux;
 $s_html .= 			'<tr><td class="c" style="text-align:center" colspan="3">';
@@ -325,15 +325,15 @@ $ta_technologies[1] = Array ('0,400,600,2', 'Ordi', 'ordinateur', 'Technologie O
 $ta_technologies[2] = Array ('800,200,0,2', 'Armes', 'armes', 'Technologie Armes');
 $ta_technologies[3] = Array ('200,600,0,2', 'Bouclier', 'bouclier', 'Technologie Bouclier');
 $ta_technologies[4] = Array ('1000,0,0,2', 'Protection', 'protection_vaisseaux', 'Technologie Protection des vaisseaux spatiaux');
-$ta_technologies[5] = Array ('0,800,400,2', 'NRJ', 'energie', 'Technologie énergie');
+$ta_technologies[5] = Array ('0,800,400,2', 'NRJ', 'energie', 'Technologie Ã©nergie');
 $ta_technologies[6] = Array ('0,4000,2000,2', 'Hyp', 'hyperespace', 'Technologie hyperespace');
-$ta_technologies[7] = Array ('400,0,600,2', 'RC', 'reacteur_combustion', 'Réacteur à combustion');
-$ta_technologies[8] = Array ('2000,4000,600,2', 'RI', 'reacteur_impulsion', 'Réacteur à impulsion');
+$ta_technologies[7] = Array ('400,0,600,2', 'RC', 'reacteur_combustion', 'RÃ©acteur Ã  combustion');
+$ta_technologies[8] = Array ('2000,4000,600,2', 'RI', 'reacteur_impulsion', 'RÃ©acteur Ã  impulsion');
 $ta_technologies[9] = Array ('10000,20000,6000,2', 'PH', 'propulsion_hyperespace', 'Propulsion hyperespace');
 $ta_technologies[10] = Array ('200,100,0,2', 'Laser', 'laser', 'Technologie Laser');
 $ta_technologies[11] = Array ('1000,300,100,2', 'Ions', 'ion', 'Technologie Ions');
 $ta_technologies[12] = Array ('2000,4000,1000,2', 'Plasma', 'plasma', 'Technologie Plasma');
-$ta_technologies[13] = Array ('240000,400000,160000,2', 'RRI', 'reseau_recherche', 'Réseau de recherche intergalactique');
+$ta_technologies[13] = Array ('240000,400000,160000,2', 'RRI', 'reseau_recherche', 'RÃ©seau de recherche intergalactique');
 $ta_technologies[14] = Array ('4000,8000,4000,1.75', 'Astrophysique', 'expeditions', 'Astrophysique');
 
 for($i = 0 ; $i < count($ta_technologies) ; $i++)
@@ -358,10 +358,10 @@ $s_html .= 			'<tr><td class="c" style="text-align:center">';
 $s_html .= 				'Nom</td><td class="c" style="text-align:center">';
 $s_html .= 				'Niveau actuel</td><td class="c" style="text-align:center">';
 $s_html .= 				'Niveau voulu</td><td class="c" style="text-align:center">';
-$s_html .= 				'Métal requis</td><td class="c" style="text-align:center">';
+$s_html .= 				'MÃ©tal requis</td><td class="c" style="text-align:center">';
 $s_html .= 				'Cristal requis</td><td class="c" style="text-align:center">';
-$s_html .= 				'Deutérium requis</td><td class="c" style="text-align:center">';
-$s_html .= 				'Durée de construction</td>';
+$s_html .= 				'DeutÃ©rium requis</td><td class="c" style="text-align:center">';
+$s_html .= 				'DurÃ©e de construction</td>';
 $s_html .= 			'</tr>';
 $s_html .=			$s_html_technologie;
 $s_html .= 			'<tr><th>';
@@ -369,7 +369,7 @@ $s_html .= 				'Technologie Graviton</th><th>';
 $s_html .= 				'<input type="text" id="graviton_actuel" size="2" maxlength="2" onkeyup="javascript:graviton();" value="'.$user_technology['Graviton'].'"></th><th>';
 $s_html .= 				'<input type="text" id="graviton_voulu" size="2" maxlength="2" onkeyup="javascript:graviton();" value="'.$user_technology['Graviton'].'"></th><th colspan="3">';
 $s_html .= 				'Energie : <input type="text" id="graviton" size="15" readonly value="0"></th><th>';
-$s_html .= 				'Instantané</th>';
+$s_html .= 				'InstantanÃ©</th>';
 $s_html .= 			'</tr><tr><td class="c" style="text-align:center" colspan="3">';
 $s_html .= 				'Total</td><th>';
 $s_html .= 				'<input type="hidden" id="technologies_metal" value="0" /><input type="text" id="technologies_metal_resultat" size="15" readonly value="0" /></th><th>';
@@ -394,14 +394,14 @@ $s_html_vaisseaux = '';
 // 0 = parametre ; 1 = code ; 2 = nom
 $ta_vaisseaux[0] = Array ('2000,2000,0', 'pt', 'Petit transporteur');
 $ta_vaisseaux[1] = Array ('6000,6000,0', 'gt', 'Grand transporteur');
-$ta_vaisseaux[2] = Array ('3000,1000,0', 'cle', 'Chasseur léger');
+$ta_vaisseaux[2] = Array ('3000,1000,0', 'cle', 'Chasseur lÃ©ger');
 $ta_vaisseaux[3] = Array ('6000,4000,0', 'clo', 'Chasseur lourd');
 $ta_vaisseaux[4] = Array ('20000,7000,2000', 'cr', 'Croiseur');
 $ta_vaisseaux[5] = Array ('45000,15000,0', 'vb', 'Vaisseau de bataille');
 $ta_vaisseaux[6] = Array ('30000,40000,15000', 'traq', 'Traqueur');
 $ta_vaisseaux[7] = Array ('50000,25000,15000', 'bb', 'Bombardier');
 $ta_vaisseaux[8] = Array ('60000,50000,15000', 'dest', 'Destructeur');
-$ta_vaisseaux[9] = Array ('5000000,4000000,1000000', 'edlm', 'Étoile de la mort');
+$ta_vaisseaux[9] = Array ('5000000,4000000,1000000', 'edlm', 'Ã‰toile de la mort');
 $ta_vaisseaux[10] = Array ('10000,6000,2000', 'recycleur', 'Recycleur');
 $ta_vaisseaux[11] = Array ('10000,20000,10000', 'vc', 'Vaisseau de colonisation');
 $ta_vaisseaux[12] = Array ('0,1000,0', 'sonde', 'Sonde d`espionnage	');
@@ -426,11 +426,11 @@ $s_html .= 		'<div id="deroulant_vaisseaux" style="display:block;">';
 $s_html .= 		'<table>';
 $s_html .= 			'<tr><td class="c" style="text-align:center">';
 $s_html .= 				'Nom</td><td class="c" style="text-align:center">';
-$s_html .= 				'Quantité voulue</td><td class="c" style="text-align:center">';
-$s_html .= 				'Métal requis</td><td class="c" style="text-align:center">';
+$s_html .= 				'QuantitÃ© voulue</td><td class="c" style="text-align:center">';
+$s_html .= 				'MÃ©tal requis</td><td class="c" style="text-align:center">';
 $s_html .= 				'Cristal requis</td><td class="c" style="text-align:center">';
-$s_html .= 				'Deutérium requis</td><td class="c" style="text-align:center">';
-$s_html .= 				'Durée de construction</td>';
+$s_html .= 				'DeutÃ©rium requis</td><td class="c" style="text-align:center">';
+$s_html .= 				'DurÃ©e de construction</td>';
 $s_html .= 			'</tr>';
 $s_html .=			$s_html_vaisseaux;
 $s_html .= 			'<tr><td class="c" style="text-align:center" colspan="2">';
@@ -450,21 +450,21 @@ $s_html .= 		'</table>';
 $s_html .= 		'</div>';
 $s_html .= '</fieldset>';
 
-// Défense
+// DÃ©fense
 
 $s_html_defense = '';
 
 // 0 = parametre ; 1 = code ; 2 = nom
 $ta_defense[0] = Array ('2000,0,0', 'lm', 'Lanceur de missiles');
-$ta_defense[1] = Array ('1500,500,0', 'ale', 'Artillerie laser légère');
+$ta_defense[1] = Array ('1500,500,0', 'ale', 'Artillerie laser lÃ©gÃ¨re');
 $ta_defense[2] = Array ('6000,2000,0', 'alo', 'Artillerie laser lourde');
-$ta_defense[3] = Array ('2000,6000,0', 'canon_ion', 'Artillerie à ions');
+$ta_defense[3] = Array ('2000,6000,0', 'canon_ion', 'Artillerie Ã  ions');
 $ta_defense[4] = Array ('20000,15000,2000', 'gauss', 'Canon de Gauss');
 $ta_defense[5] = Array ('50000,50000,30000', 'lp', 'Lanceur de plasma');
 $ta_defense[6] = Array ('10000,10000,0', 'pb', 'Petit bouclier');
 $ta_defense[7] = Array ('50000,50000,30000', 'gb', 'Grand bouclier');
 $ta_defense[8] = Array ('8000,0,2000', 'min', 'Missile d`interception');
-$ta_defense[9] = Array ('12500,2500,10000', 'mip', 'Missile interplanétaire');
+$ta_defense[9] = Array ('12500,2500,10000', 'mip', 'Missile interplanÃ©taire');
 
 for($i = 0 ; $i < count($ta_defense) ; $i++)
 {
@@ -480,16 +480,16 @@ for($i = 0 ; $i < count($ta_defense) ; $i++)
 }
 
 $s_html .= '<fieldset>';
-$s_html .= 		'<legend><img src="mod/'.$mod_root.'/moins.png" style="cursor:pointer;" alt="moins" onclick="javascript:f_inverse(\'deroulant_defense\', this)" /> Défense</legend>';
+$s_html .= 		'<legend><img src="mod/'.$mod_root.'/moins.png" style="cursor:pointer;" alt="moins" onclick="javascript:f_inverse(\'deroulant_defense\', this)" /> DÃ©fense</legend>';
 $s_html .= 		'<div id="deroulant_defense" style="display:block;">';
 $s_html .= 		'<table>';
 $s_html .= 			'<tr><td class="c" style="text-align:center">';
 $s_html .= 				'Nom</td><td class="c" style="text-align:center">';
-$s_html .= 				'Quantité voulue</td><td class="c" style="text-align:center">';
-$s_html .= 				'Métal requis</td><td class="c" style="text-align:center">';
+$s_html .= 				'QuantitÃ© voulue</td><td class="c" style="text-align:center">';
+$s_html .= 				'MÃ©tal requis</td><td class="c" style="text-align:center">';
 $s_html .= 				'Cristal requis</td><td class="c" style="text-align:center">';
-$s_html .= 				'Deutérium requis</td><td class="c" style="text-align:center">';
-$s_html .= 				'Durée de construction</td>';
+$s_html .= 				'DeutÃ©rium requis</td><td class="c" style="text-align:center">';
+$s_html .= 				'DurÃ©e de construction</td>';
 $s_html .= 			'</tr>';
 $s_html .=			$s_html_defense;
 $s_html .= 			'<tr><td class="c" style="text-align:center" colspan="2">';
@@ -515,8 +515,8 @@ $s_html .= '</fieldset>';
 // $s_html .= 		'<legend><img src="mod/'.$mod_root.'/moins.png" style="cursor:pointer;" alt="moins" onclick="javascript:f_inverse(\'deroulant_gestion\', this)" /> Gestion</legend>';
 // $s_html .= 		'<div id="deroulant_gestion" style="display:block;">';
 // $s_html .= 		'<div>';
-// $s_html .= 			'<input type="submit" value="Sauvegarder les données" onclick="javascript:sauvegarde();" />';
-// $s_html .= 			'<input type="submit" value="Restaurer les données" onclick="javascript:restaure();" />';
+// $s_html .= 			'<input type="submit" value="Sauvegarder les donnÃ©es" onclick="javascript:sauvegarde();" />';
+// $s_html .= 			'<input type="submit" value="Restaurer les donnÃ©es" onclick="javascript:restaure();" />';
 // $s_html .= 			'<input type="submit" value="Changelog" onclick="javascript:inverse(\'changelog\');" />';
 // $s_html .= 			'<input type="submit" value="Reset" onclick="javascript:f_reset_donnees();" />';
 // $s_html .= 		'</div>';
@@ -526,10 +526,10 @@ $s_html .= '</fieldset>';
 // $s_html .= 			'<ol style="list-style-type: none;">';
 // $s_html .= 				'<li>v1.1.0';
 // $s_html .= 				'<ul type="disc">';
-// $s_html .= 					'<li>Compatibilité OGSpy 3.1.0</li>';
+// $s_html .= 					'<li>CompatibilitÃ© OGSpy 3.1.0</li>';
 // $s_html .= 					'<li>Optimisation du code</li>';
 // $s_html .= 					'<li>Simplification du fonctionnement</li>';
-// $s_html .= 					'<li>Séparation des milliers avec un espace</li>';
+// $s_html .= 					'<li>SÃ©paration des milliers avec un espace</li>';
 // $s_html .= 				'</ul>';
 // $s_html .= 			'</ol>';
 // $s_html .= 			'<p>18/04/2008</p>';
@@ -537,22 +537,22 @@ $s_html .= '</fieldset>';
 // $s_html .= 				'<li>v0.5';
 // $s_html .= 				'<ul type="disc">';
 // $s_html .= 					'<li>Ajout du calcul des transports</li>';
-// $s_html .= 					'<li>Ajout du script de désintallation</li>';
-// $s_html .= 					'<li>Controle de sécurité pour éviter l\'erreur de "Duplicate Entry"</li>';
+// $s_html .= 					'<li>Ajout du script de dÃ©sintallation</li>';
+// $s_html .= 					'<li>Controle de sÃ©curitÃ© pour Ã©viter l\'erreur de "Duplicate Entry"</li>';
 // $s_html .= 				'</ul>';
 // $s_html .= 			'</ol>';
 // $s_html .= 			'<p>18/04/2008</p>';
 // $s_html .= 			'<ol style="list-style-type: none;">';
 // $s_html .= 				'<li>v0.4d';
 // $s_html .= 				'<ul type="disc">';
-// $s_html .= 					'<li>Fix d\'un bug à l\'installation</li>';
+// $s_html .= 					'<li>Fix d\'un bug Ã  l\'installation</li>';
 // $s_html .= 				'</ul>';
 // $s_html .= 			'</ol>';
 // $s_html .= 			'<p>16/04/2008</p>';
 // $s_html .= 			'<ol style="list-style-type: none;">';
 // $s_html .= 				'<li>v0.4c';
 // $s_html .= 				'<ul type="disc">';
-// $s_html .= 					'<li>Ajout de la technologie expéditions</li>';
+// $s_html .= 					'<li>Ajout de la technologie expÃ©ditions</li>';
 // $s_html .= 					'<li>Modification du fichier install</li>';
 // $s_html .= 					'<li>Correction du chemin pour atteindre formule.js</li>';
 // $s_html .= 				'</ul>';
@@ -564,14 +564,14 @@ $s_html .= '</fieldset>';
 // $s_html .= 					'<li>Ajout du traqueur</li>';
 // $s_html .= 					'<li>Correction du bug d\'affichage qui ne permmetait pas de voir les ressources</li>';
 // $s_html .= 					'<li>Modification du prix du traqueur</li>';
-// $s_html .= 					'<li>Installation des Install/Update qui récupére le n° de version dans le fichier version.txt</li>';
+// $s_html .= 					'<li>Installation des Install/Update qui rÃ©cupÃ©re le nÂ° de version dans le fichier version.txt</li>';
 // $s_html .= 				'</ul>';
 // $s_html .= 			'</ol>';
 // $s_html .= 			'<p>09/08/2006</p>';
 // $s_html .= 			'<ol style="list-style-type: none;">';
 // $s_html .= 				'<li>v0.3';
 // $s_html .= 					'<ul type="disc">';
-// $s_html .= 					'<li>Correction du problème des prix du terraformeur (merci ben_12)</li>';
+// $s_html .= 					'<li>Correction du problÃ¨me des prix du terraformeur (merci ben_12)</li>';
 // $s_html .= 					'<li>Correction du non-rafraichissement des temps si modifications du niveau de l\'usine de robots et de nanites ou du chantier spatial</li>';
 // $s_html .= 				'</ul>';
 // $s_html .= 			'</ol>';
@@ -579,8 +579,8 @@ $s_html .= '</fieldset>';
 // $s_html .= 			'<ol style="list-style-type: none;">';
 // $s_html .= 				'<li>v0.2';
 // $s_html .= 				'<ul type="disc">';
-// $s_html .= 					'<li>Correction d\'un bug empêchant le calcul des technologies</li>';
-// $s_html .= 					'<li>Correction d\'un problème de calcul de l\'énergie nécessaire au graviton (merci Corwin)</li>';
+// $s_html .= 					'<li>Correction d\'un bug empÃªchant le calcul des technologies</li>';
+// $s_html .= 					'<li>Correction d\'un problÃ¨me de calcul de l\'Ã©nergie nÃ©cessaire au graviton (merci Corwin)</li>';
 // $s_html .= 					'<li>Ajout de la fonction reset</li>';
 // $s_html .= 				'</ul>';
 // $s_html .= 			'</ol>';
@@ -596,8 +596,8 @@ $s_html .= '</fieldset>';
 // $s_html .= '</fieldset>';
 
 $s_html .= '<div style="font-size:10px;width:400px;text-align:center;background-image:url(\'skin/OGSpy_skin/tableaux/th.png\');background-repeat:repeat;">OGSCalc ('.$mod_version.')';
-$s_html .= 		'<br>Développé par <a href="http://forum.ogsteam.fr/index.php?action=emailuser;sa=email;uid=1">Aéris</a>';
-$s_html .= 		'<br>Mise à jour par <a href="mailto:contact@epe-production.org?subject=ogscalc">xaviernuma</a> 2012';
+$s_html .= 		'<br>DÃ©veloppÃ© par <a href="http://forum.ogsteam.fr/index.php?action=emailuser;sa=email;uid=1">AÃ©ris</a>';
+$s_html .= 		'<br>Mise Ã  jour par <a href="mailto:contact@epe-production.org?subject=ogscalc">xaviernuma</a> 2015';
 $s_html .= '</div>';
 
 echo $s_html;
