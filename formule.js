@@ -96,7 +96,27 @@ function f_inverse(balise, o_img)
 
 function coutDe_A ( p1, alpha, i, j )
 {
-	if ( i>j ) { return 0; } else { return Math.floor(p1*(Math.pow(alpha,j)-Math.pow(alpha,i))/(alpha-1)); }
+	// Empêche de mettre un niveau inférieur à ce qui à déjà été construit.
+	// if ( i>j ) 
+	// { 
+		// return 0; 
+	// } 
+	// else 
+	// { 
+		// return Math.floor(p1*(Math.pow(alpha,j)-Math.pow(alpha,i))/(alpha-1)); 
+	// }
+	
+	if(isNaN(i))
+	{
+		return 0;
+	}
+	
+	if(isNaN(j))
+	{
+		return 0;
+	}
+	
+	return Math.floor(p1*(Math.pow(alpha,j)-Math.pow(alpha,i))/(alpha-1));
 }
 
 function graviton()
