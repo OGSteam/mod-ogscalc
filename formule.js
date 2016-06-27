@@ -2,7 +2,7 @@ var batimentsOGSpy = new Array();
 var technologiesOGSpy = new Array();
 
 arrayTechno = new Array('robot','chantier','nanite','labopm','labo1','labo2','labo3','labo4','labo5','labo6','labo7','labo8','reseau');
-arrayBatiments = new Array('mine_metal','mine_cristal','synthetiseur_deuterium','centrale_solaire','reacteur_fusion','usine_robots','usine_nanites','chantier_spatial','hangar_metal','hangar_cristal','reservoir_deuterium','laboratoire','silo_missiles','terraformeur', 'cachette_metal', 'cachette_cristal', 'cachette_deuterium');
+arrayBatiments = new Array('mine_metal','mine_cristal','synthetiseur_deuterium','centrale_solaire','reacteur_fusion','usine_robots','usine_nanites','chantier_spatial','hangar_metal','hangar_cristal','reservoir_deuterium','laboratoire','silo_missiles','terraformeur');
 arrayBatimentsSpeciaux = new Array('base_lunaire','phalange_capteurs','porte_saut_spatial','depot_ravitaillement');
 arrayTechnologies = new Array('espionnage','ordinateur','armes','bouclier','protection_vaisseaux','energie','hyperespace','reacteur_combustion','reacteur_impulsion','propulsion_hyperespace','laser','ion','plasma','reseau_recherche','expeditions');
 arrayVaisseaux = new Array('pt','gt','cle','clo','cr','vb','traq','bb','dest','edlm','recycleur','vc','sonde','satellite');
@@ -668,8 +668,8 @@ function chargement(id_planete)
 	
 	for(i = 0 ; i < arrayBatimentsSpeciaux.length ; i++)
 	{
-		document.getElementById(arrayBatimentsSpeciaux[i]+'_actuel').value = parseFloat(batimentsOGSpy[id_planete][i+18]);
-		document.getElementById(arrayBatimentsSpeciaux[i]+'_voulu').value = parseFloat(batimentsOGSpy[id_planete][i+18]);
+		document.getElementById(arrayBatimentsSpeciaux[i]+'_actuel').value = parseFloat(batimentsOGSpy[id_planete][i+15]);
+		document.getElementById(arrayBatimentsSpeciaux[i]+'_voulu').value = parseFloat(batimentsOGSpy[id_planete][i+15]);
 	}
 	
 	for(i = 0 ; i < arrayTechnologies.length ; i++)

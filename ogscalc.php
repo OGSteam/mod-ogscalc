@@ -4,7 +4,7 @@
 * ogscalc.php - Programme principal
 * @package Calculatrice universelle
 * @author Aeris
-* @update xaviernuma - 2015
+* @update xaviernuma - 2016
 * @link http://www.ogsteam.fr/
 **/
 
@@ -28,11 +28,10 @@ if(!$db->sql_numrows($ta_resultat))
 list ( $mod_version, $mod_root ) = $db->sql_fetch_row($ta_resultat);
 
 $s_html = ''; 
-$user_empire = user_get_empire();
+$user_empire = user_get_empire($user_data['user_id']);
 $user_building = $user_empire["building"];
 $user_technology = $user_empire["technology"];
 $vitesse = $server_config['speed_uni'];
-
 $s_html .= '<script type="text/javascript" src="mod/'.$mod_root.'/formule.js"></script>';
 $s_html .= '<script type="text/javascript">';
 $s_html .= 'var vitesse_univers = '.$vitesse.';';
@@ -58,9 +57,6 @@ foreach($user_building as $ta_une_planete)
 				$ta_une_planete['Lab']."','".
 				$ta_une_planete['Silo']."','".
 				$ta_une_planete['Ter']."','".
-				$ta_une_planete['CM']."','".
-				$ta_une_planete['CC']."','".
-				$ta_une_planete['CD']."','".
 				$ta_une_planete['BaLu']."','".
 				$ta_une_planete['Pha']."','".
 				$ta_une_planete['PoSa']."','".
@@ -202,15 +198,12 @@ $ta_batiments[4] = Array ('900,360,180,1.8', 'CEF', 'reacteur_fusion', 'Centrale
 $ta_batiments[5] = Array ('1000,0,0,2', 'HM', 'hangar_metal', 'Hangar de métal');
 $ta_batiments[6] = Array ('1000,500,0,2', 'HC', 'hangar_cristal', 'Hangar de cristal');
 $ta_batiments[7] = Array ('1000,1000,0,2', 'HD', 'reservoir_deuterium', 'Réservoir de deutérium');
-$ta_batiments[8] = Array ('2645,0,0,2', 'CM', 'cachette_metal', 'Cachette de métal camouflée');
-$ta_batiments[9] = Array ('2645,1322,0,2', 'CC', 'cachette_cristal', 'Cachette de cristal souterraine');
-$ta_batiments[10] = Array ('2645,2645,0,2', 'CD', 'cachette_deuterium', 'Cachette de deutérium sous-marine');
-$ta_batiments[11] = Array ('400,120,200,2', 'UdR', 'usine_robots', 'Usine de robots');
-$ta_batiments[12] = Array ('1000000,500000,100000,2', 'UdN', 'usine_nanites', 'Usine de nanites');
-$ta_batiments[13] = Array ('400,200,100,2', 'CSp', 'chantier_spatial', 'Chantier spatial');
-$ta_batiments[14] = Array ('200,400,200,2', 'Lab', 'laboratoire', 'Laboratoire de recherche');
-$ta_batiments[15] = Array ('20000,20000,1000,2', 'Silo', 'silo_missiles', 'Silo de missiles');
-$ta_batiments[16] = Array ('1000,50000,100000,2', 'Ter', 'terraformeur', 'Terraformeur');
+$ta_batiments[8] = Array ('400,120,200,2', 'UdR', 'usine_robots', 'Usine de robots');
+$ta_batiments[9] = Array ('1000000,500000,100000,2', 'UdN', 'usine_nanites', 'Usine de nanites');
+$ta_batiments[10] = Array ('400,200,100,2', 'CSp', 'chantier_spatial', 'Chantier spatial');
+$ta_batiments[11] = Array ('200,400,200,2', 'Lab', 'laboratoire', 'Laboratoire de recherche');
+$ta_batiments[12] = Array ('20000,20000,1000,2', 'Silo', 'silo_missiles', 'Silo de missiles');
+$ta_batiments[13] = Array ('1000,50000,100000,2', 'Ter', 'terraformeur', 'Terraformeur');
 
 for($i = 0 ; $i < count($ta_batiments) ; $i++)
 {
@@ -597,7 +590,7 @@ $s_html .= '</fieldset>';
 
 $s_html .= '<div style="font-size:10px;width:400px;text-align:center;background-image:url(\'skin/OGSpy_skin/tableaux/th.png\');background-repeat:repeat;">OGSCalc ('.$mod_version.')';
 $s_html .= 		'<br>Développé par <a href="http://forum.ogsteam.fr/index.php?action=emailuser;sa=email;uid=1">Aéris</a>';
-$s_html .= 		'<br>Mise à jour par <a href="mailto:contact@epe-production.org?subject=ogscalc">xaviernuma</a> 2015';
+$s_html .= 		'<br>Mise à jour par <a href="mailto:contact@epe-production.org?subject=ogscalc">xaviernuma</a> 2016';
 $s_html .= '</div>';
 
 echo $s_html;
