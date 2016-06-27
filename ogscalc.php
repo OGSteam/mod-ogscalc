@@ -106,8 +106,8 @@ foreach($user_building as $ta_une_planete)
 		$s_html .= 	'<option value="'.$i.'">';
 		$s_html .= 		$ta_une_planete['planet_name'].' ['.$ta_une_planete['coordinates'].']';
 		$s_html .= 	'</option>';
+		$i++;
 	}
-	$i++;
 }
 $s_html .= 					'</select>';
 $s_html .= 					'</th>';
