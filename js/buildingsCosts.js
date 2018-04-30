@@ -48,28 +48,30 @@ function buildingCost( project ) {
 	let costProjectBuildingT = 0;
 
 	let current = document.getElementById( project.id );
+	let currentValue = parseInt( current.value, 10 );
+	let projectValue = parseInt( project.value, 10 );
 	let position = getPosition( current );
-    if( current.value <= project.value ) {
+    if( currentValue <= projectValue ) {
     	let buildProject = {};
     	let buildCurrent = {};
     	if( project.classList.contains( "M" ) ) {
-    		buildProject = metalMine( project.value );
-    		buildCurrent = metalMine( current.value );
+    		buildProject = metalMine( projectValue );
+    		buildCurrent = metalMine( currentValue );
     	} else if( project.classList.contains( "C" ) ) {
-    		buildProject = crystalMine( project.value );
-    		buildCurrent = crystalMine( current.value );
+    		buildProject = crystalMine( projectValue );
+    		buildCurrent = crystalMine( currentValue );
     	} else if( project.classList.contains( "D" ) ) {
-    		buildProject = deutMine( project.value );
-    		buildCurrent = deutMine( current.value );
+    		buildProject = deutMine( projectValue );
+    		buildCurrent = deutMine( currentValue );
     	} else if( project.classList.contains( "CES" ) ) {
-    		buildProject = solar( project.value );
-    		buildCurrent = solar( current.value );
+    		buildProject = solar( projectValue );
+    		buildCurrent = solar( currentValue );
     	} else if( project.classList.contains( "CEF" ) ) {
-    		buildProject = fusion( project.value );
-    		buildCurrent = fusion( current.value );
+    		buildProject = fusion( projectValue );
+    		buildCurrent = fusion( currentValue );
     	} else {
-    		buildProject = building( project.classList[2], project.value );
-    		buildCurrent = building( current.classList[2], current.value );
+    		buildProject = building( project.classList[2], projectValue );
+    		buildCurrent = building( current.classList[2], currentValue );
     	}
     	//need temp val to calc time
         let tmpProjectM = Math.floor( buildProject.metal );
@@ -92,47 +94,42 @@ function buildingCost( project ) {
         	costProjectBuildingT += timeConstBuildings( tmpProjectM-tmpCurrentM, tmpProjectC-tmpCurrentC, position );
     	}
 	} else {
-		let diffLvl = current.value - project.value;	
+		let diffLvl = currentValue - projectValue;	
 
     	let buildingCurrent = {};
     	let buildingDiff = {};	
     	let buildingDestPrice = {};	
 
     	if( project.classList.contains( "M" ) ) {
-	    	buildingCurrent = metalMine( current.value );
-	    	buildingDiff = metalMine( current.value - diffLvl );
-	    	buildingDestPrice = metalMineDest( current.value, project.value );
+	    	buildingCurrent = metalMine( currentValue );
+	    	buildingDiff = metalMine( currentValue - diffLvl );
+	    	buildingDestPrice = metalMineDest( currentValue, projectValue );
     	} else if( project.classList.contains( "C" ) ) {
 	    	buildingCurrent = crystalMine( current.value );
 	    	buildingDiff = crystalMine( current.value - diffLvl );
-	    	buildingDestPrice = crystalMineDest( current.value, project.value );
+	    	buildingDestPrice = crystalMineDest( currentValue, projectValue );
     	} else if( project.classList.contains( "D" ) ) {
-	    	buildingCurrent = deutlMine( current.value );
-	    	buildingDiff = deutMine( current.value - diffLvl );
+	    	buildingCurrent = deutlMine( currentValue );
+	    	buildingDiff = deutMine( currentValue - diffLvl );
 	    	buildingDestPrice = deutMineDest( current.value, project.value );
     	} else if( project.classList.contains( "CES" ) ) {
-	    	buildingCurrent = solar( current.value );
-	    	buildingDiff = solar( current.value - diffLvl );
-	    	buildingDestPrice = solarDest( current.value, project.value );
+	    	buildingCurrent = solar( currentValue );
+	    	buildingDiff = solar( currentValue - diffLvl );
+	    	buildingDestPrice = solarDest( currentValue, projectValue );
     	} else if( project.classList.contains( "CEF" ) ) {
-	    	buildingCurrent = fusion( current.value );
-	    	buildingDiff = fusion( current.value - diffLvl );
-	    	buildingDestPrice = fusionDest( current.value, project.value );
+	    	buildingCurrent = fusion( currentValue );
+	    	buildingDiff = fusion( currentValue - diffLvl );
+	    	buildingDestPrice = fusionDest( currentValue, projectValue );
 	    } else {
-	    	buildingCurrent = building( current.classList[2], current.value );
-	    	buildingDiff = building( current.classList[2], current.value - diffLvl );
-	    	console.log( project );
-	    	console.log( project.value );
-	    	console.log( current );
-	    	console.log( current.value );
-
-	    	buildingDestPrice = buildingDest( project.classList[2], current.value, project.value );
+	    	buildingCurrent = building( current.classList[2], currentValue );
+	    	buildingDiff = building( current.classList[2], currentValue - diffLvl );
+	    	buildingDestPrice = buildingDest( project.classList[2], currentValue, projectValue );
 	    }
     	//need temp val to calc time
     	let tmpProjectM = 0;
     	let tmpProjectC = 0;
-    	let currentLvl = parseInt( current.value );
-    	while( currentLvl > project.value ) {
+    	let currentLvl = parseInt( currentValue, 10 );
+    	while( currentLvl > projectValue ) {
     		let TEMPLow = {};
     		let TEMPSup = {};
 			if( project.classList.contains( "M" ) ) {

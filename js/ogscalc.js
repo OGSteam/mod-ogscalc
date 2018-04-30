@@ -66,12 +66,12 @@ function getLevelsOfUser() {
 		var arrayLabNode = document.getElementsByClassName("building current LAB");
 		if( RRILevelUser + 1 >= arrayLabNode.length ) {
 			for (var i = 0; i < arrayLabNode.length; i++) {
-				labUser += parseInt( arrayLabNode[i].value );
+				labUser += parseInt( arrayLabNode[i].value, 10 );
 			}
 		} else {
 			let varLabs = [];
 			for (var i = 0; i < arrayLabNode.length; i++) {
-				 varLabs.push( parseInt( arrayLabNode[i].value ) );
+				 varLabs.push( parseInt( arrayLabNode[i].value, 10 ) );
 			}
 			for (var i = 0; i < RRILevelUser + 1 ; i++) {
 				var lvlLabToAdd = Math.max.apply( Math, varLabs );
@@ -85,11 +85,11 @@ function getLevelsOfUser() {
 	}
 	var arrayUDRNode = document.getElementsByClassName("building current UDR");		
 	for (var i = 0; i < arrayUDRNode.length; i++) {
-		uDRUser[arrayUDRNode[i].id] = parseInt( arrayUDRNode[i].value );
+		uDRUser[arrayUDRNode[i].id] = parseInt( arrayUDRNode[i].value, 10 );
 	}
 	var arrayCSPNode = document.getElementsByClassName("building current CSP");		
 	for (var i = 0; i < arrayCSPNode.length; i++) {
-		cSPUser[arrayCSPNode[i].id] = parseInt( arrayCSPNode[i].value );
+		cSPUser[arrayCSPNode[i].id] = parseInt( arrayCSPNode[i].value, 10 );
 	}
 }
 

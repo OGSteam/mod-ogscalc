@@ -106,7 +106,7 @@ function timeConstBuildings( metal, crystal, position ) {
 }
 
 function metalMine( level ) {
-
+	
 	return {
 		metal: priceBuildings["M"][0] * (1 - Math.pow(1.5, level)) / (1 - 1.5),
 		crystal: priceBuildings["M"][1] * (1 - Math.pow(1.5, level)) / (1 - 1.5),
@@ -215,7 +215,7 @@ function building( building, level ) {
 	}
 }
 
-function buildingDest( building, currentlevel, projectlevel ) {
+function buildingDest( building, currentLevel, projectlevel ) {
 
 	return {
 		metal: (1 - 0.04 * IonsLevelUser ) * ( priceBuildings[building][0] * - ( 1 - Math.pow( 2, currentLevel - 1 ) ) - ( priceBuildings[building][0] * - ( 1 - Math.pow( 2, projectlevel - 1 ) ) ) ),
