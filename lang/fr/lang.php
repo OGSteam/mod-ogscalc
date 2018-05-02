@@ -14,5 +14,7 @@
 
 	$lang['OGSCALC_TIME'] = "Temps";
 	$lang['OGSCALC_POINTS'] = "Points";
-	
+	$lang['OGSCALC_TIME_PRODUCTION'] = "Jours nécessaires";
+	$lang['OGSCALC_TIME_PRODUCTION_CONVERT'] = "Jours nécessaires après convertion";
+	$lang['OGSCALC_TIME_PRODUCTION_CONVERT_TAUX'] = "Taux pris pour la convertion : 3/2/1";
 ?>

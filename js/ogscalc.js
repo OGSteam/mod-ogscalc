@@ -54,7 +54,33 @@ var sumGT = document.getElementById( 'sum_gt' );
 var sumPoints = document.getElementById( 'sum_points' );
 var sumTime = document.getElementById( 'sum_time' );
 
-
+//convert buildings time
+var timeMetalBuildings = document.getElementById( 'time_metal_buildings' );
+var timeCrystalBuildings = document.getElementById( 'time_crystal_buildings' );
+var timeDeutBuildings = document.getElementById( 'time_deut_buildings' );
+var timeConvertBuildings = document.getElementById( 'time_convert_buildings' );
+if( view === "planets" ) {
+	//convert technos time
+	var timeMetalTechnos = document.getElementById( 'time_metal_technos' );
+	var timeCrystalTechnos = document.getElementById( 'time_crystal_technos' );
+	var timeDeutTechnos = document.getElementById( 'time_deut_technos' );
+	var timeConvertTechnos = document.getElementById( 'time_convert_technos' );
+}
+//convert weapons time
+var timeMetalWeapons = document.getElementById( 'time_metal_weapons' );
+var timeCrystalWeapons = document.getElementById( 'time_crystal_weapons' );
+var timeDeutWeapons = document.getElementById( 'time_deut_weapons' );
+var timeConvertWeapons = document.getElementById( 'time_convert_weapons' );
+//convert divers time
+var timeMetalDivers = document.getElementById( 'time_metal_divers' );
+var timeCrystalDivers = document.getElementById( 'time_crystal_divers' );
+var timeDeutDivers = document.getElementById( 'time_deut_divers' );
+var timeConvertDivers = document.getElementById( 'time_convert_divers' );
+//convert sum time
+var timeMetal = document.getElementById( 'time_metal' );
+var timeCrystal = document.getElementById( 'time_crystal' );
+var timeDeut = document.getElementById( 'time_deut' );
+var timeConvert = document.getElementById( 'time_convert' );
 
 function getLevelsOfUser() {
 
@@ -144,6 +170,34 @@ function setSumToZero() {
 	sumGT.textContent = 0;
 	sumPoints.textContent = 0;
 	sumTime.textContent = convertS( 0 );
+
+	//convert buildings time
+	timeMetalBuildings.textContent = convertH( 0 );
+ 	timeCrystalBuildings.textContent = convertH( 0 );
+ 	timeDeutBuildings.textContent = convertH( 0 );
+ 	timeConvertBuildings.textContent = convertH( 0 );
+	//convert technos time
+	if( view === "planets" ) {
+ 		timeMetalTechnos.textContent = convertH( 0 );
+ 		timeCrystalTechnos.textContent = convertH( 0 );
+ 		timeDeutTechnos.textContent = convertH( 0 );
+ 		timeConvertTechnos.textContent = convertH( 0 );
+	}
+	//convert weapons time
+ 	timeMetalWeapons.textContent = convertH( 0 );
+ 	timeCrystalWeapons.textContent = convertH( 0 );
+ 	timeDeutWeapons.textContent = convertH( 0 );
+ 	timeConvertWeapons.textContent = convertH( 0 );
+ 	//convert divers time
+	timeMetalDivers.textContent = convertH( 0 );
+	timeCrystalDivers.textContent = convertH( 0 );
+	timeDeutDivers.textContent = convertH( 0 );
+	timeConvertDivers.textContent = convertH( 0 );
+	//convert sum time
+	timeMetal.textContent = convertH( 0 );
+	timeCrystal.textContent = convertH( 0 );
+	timeDeut.textContent = convertH( 0 );
+	timeConvert.textContent = convertH( 0 );
 }
 
 function initHtml() {
@@ -277,7 +331,10 @@ function objectifs() {
 	sumGTBuildings.textContent = dotSeparateNumber( calcTransport( capaGT, costProjectBuildingM, costProjectBuildingC, costProjectBuildingD ) );
 	sumPointsBuildings.textContent = dotSeparateNumber( calcPoints( totalResourceBuilding, 0, 0) ); 
 	sumTimeBuildings.textContent = convertS( costProjectBuildingT );
-	
+	timeMetalBuildings.textContent = calcTimeProduction( metalPerHour, Math.floor(costProjectBuildingM) );
+	timeCrystalBuildings.textContent = calcTimeProduction( crystalPerHour, Math.floor(costProjectBuildingC) );
+	timeDeutBuildings.textContent = calcTimeProduction( deutPerHour, Math.floor(costProjectBuildingD) );
+	timeConvertBuildings.textContent = calcTimeProductionConvert( Math.floor(costProjectBuildingM), Math.floor(costProjectBuildingC), Math.floor(costProjectBuildingD), metalPerHour, crystalPerHour, deutPerHour );
 	//techno
 	if( view === "planets" ) {
 		totalResourceTechno = costProjectTechnoM + costProjectTechnoC + costProjectTechnoD;
@@ -290,6 +347,10 @@ function objectifs() {
 		sumGTTechnos.textContent = dotSeparateNumber( calcTransport( capaGT, costProjectTechnoM, costProjectTechnoC, costProjectTechnoD ) );
 		sumPointsTechnos.textContent = dotSeparateNumber( calcPoints( totalResourceTechno, 0, 0) ); 
 		sumTimeTechnos.textContent = convertS( costProjectTechnoT );
+		timeMetalTechnos.textContent = calcTimeProduction( metalPerHour, Math.floor(costProjectTechnoM) );
+		timeCrystalTechnos.textContent = calcTimeProduction( crystalPerHour, Math.floor(costProjectTechnoC) );
+		timeDeutTechnos.textContent = calcTimeProduction( deutPerHour, Math.floor(costProjectTechnoD) );
+		timeConvertTechnos.textContent = calcTimeProductionConvert( Math.floor(costProjectTechnoM), Math.floor(costProjectTechnoC), Math.floor(costProjectTechnoD), metalPerHour, crystalPerHour, deutPerHour );
 	}
 
 	//divers
@@ -301,6 +362,10 @@ function objectifs() {
 	sumGTDivers.textContent = dotSeparateNumber( calcTransport( capaGT, costProjectDiversM, costProjectDiversC, costProjectDiversD ) );
 	sumPointsDivers.textContent = dotSeparateNumber( calcPoints( totalResourceDivers, 0, 0) ); 
 	sumTimeDivers.textContent = convertS( costProjectDiversT );
+	timeMetalDivers.textContent = calcTimeProduction( metalPerHour, Math.floor(costProjectDiversM) );
+	timeCrystalDivers.textContent = calcTimeProduction( crystalPerHour, Math.floor(costProjectDiversC) );
+	timeDeutDivers.textContent = calcTimeProduction( deutPerHour, Math.floor(costProjectDiversD) );
+	timeConvertDivers.textContent = calcTimeProductionConvert( Math.floor(costProjectDiversM), Math.floor(costProjectDiversC), Math.floor(costProjectDiversD), metalPerHour, crystalPerHour, deutPerHour );
 
 	//weapons
 	totalResourceWeapon = costProjectWeaponM + costProjectWeaponC + costProjectWeaponD;
@@ -311,6 +376,10 @@ function objectifs() {
 	sumGTWeapons.textContent = dotSeparateNumber( calcTransport( capaGT, costProjectWeaponM, costProjectWeaponC, costProjectWeaponD ) );
 	sumPointsWeapons.textContent = dotSeparateNumber( calcPoints( totalResourceWeapon, 0, 0) ); 
 	sumTimeWeapons.textContent = convertS( costProjectWeaponT );
+	timeMetalWeapons.textContent = calcTimeProduction( metalPerHour, Math.floor(costProjectWeaponM) );
+	timeCrystalWeapons.textContent = calcTimeProduction( crystalPerHour, Math.floor(costProjectWeaponC) );
+	timeDeutWeapons.textContent = calcTimeProduction( deutPerHour, Math.floor(costProjectWeaponD) );
+	timeConvertWeapons.textContent = calcTimeProductionConvert( Math.floor(costProjectWeaponM), Math.floor(costProjectWeaponC), Math.floor(costProjectWeaponD), metalPerHour, crystalPerHour, deutPerHour );
 
 	//sum
 	totalResource = totalResourceBuilding + totalResourceTechno + totalResourceDivers + totalResourceWeapon;
@@ -322,8 +391,12 @@ function objectifs() {
 	}
 	sumPT.textContent = dotSeparateNumber( calcTransport( capaPT, totalResource, 0, 0 ) );
 	sumGT.textContent = dotSeparateNumber( calcTransport( capaGT, totalResource, 0, 0 ) );
-	sumPoints.textContent = dotSeparateNumber( calcPoints( totalResource, 0, 0) )
-	sumTime.textContent = convertS( costProjectBuildingT + costProjectTechnoT + costProjectDiversT + costProjectWeaponT )
+	sumPoints.textContent = dotSeparateNumber( calcPoints( totalResource, 0, 0) );
+	sumTime.textContent = convertS( costProjectBuildingT + costProjectTechnoT + costProjectDiversT + costProjectWeaponT );
+	timeMetal.textContent = calcTimeProduction( metalPerHour, Math.floor(costProjectBuildingM) + Math.floor(costProjectTechnoM) + Math.floor(costProjectWeaponM) + Math.floor(costProjectDiversM) );
+	timeCrystal.textContent = calcTimeProduction( crystalPerHour, Math.floor(costProjectBuildingC) + Math.floor(costProjectTechnoC) + Math.floor(costProjectWeaponC) + Math.floor(costProjectDiversC) );
+	timeDeut.textContent = calcTimeProduction( deutPerHour, Math.floor(costProjectBuildingD) + Math.floor(costProjectTechnoD) + Math.floor(costProjectWeaponD) + Math.floor(costProjectDiversD) );
+	timeConvert.textContent = calcTimeProductionConvert( Math.floor(costProjectBuildingM) + Math.floor(costProjectTechnoM) + Math.floor(costProjectWeaponM) + Math.floor(costProjectDiversM), Math.floor(costProjectBuildingC) + Math.floor(costProjectTechnoC) + Math.floor(costProjectWeaponC) + Math.floor(costProjectDiversC), Math.floor(costProjectBuildingD) + Math.floor(costProjectTechnoD) + Math.floor(costProjectWeaponD) + Math.floor(costProjectDiversD), metalPerHour, crystalPerHour, deutPerHour );
 }
 
 function calcTransport( capacity, res1, res2, res3 ) {
@@ -349,6 +422,44 @@ function calcPoints( res1, res2, res3 ) {
 	return res;
 }
 
+function calcTimeProductionConvert( metalResource, crystalResource, deutResource, metalProd, crystalProd, deutProd ) {
+	
+	let metalResourceConvert = 0;
+	let metalProdConvert = 0;
+	let crystalResourceConvert = 0;
+	let crystalProdConvert = 0;
+	let resourcesConvertedInDeut = 0;
+	let prodsConvertedInDeut = 0;
+
+	if( metalResource !== 0 ) {
+		metalResourceConvert = metalResource / 3;
+		resourcesConvertedInDeut += metalResourceConvert;
+	}
+	if( metalProd !== 0 ) {
+		metalProdConvert = metalProd / 3;
+		prodsConvertedInDeut += metalProdConvert;
+	}
+
+	if( crystalResource !== 0 ) {
+		crystalResourceConvert = crystalResource / 2;
+		resourcesConvertedInDeut += crystalResourceConvert;
+	}
+	if( crystalProd !== 0 ) {
+		crystalProdConvert = crystalProd / 2;
+		prodsConvertedInDeut += crystalProdConvert;
+	}
+
+	resourcesConvertedInDeut += deutResource;
+	prodsConvertedInDeut += deutProd;
+
+	return calcTimeProduction( Math.floor( prodsConvertedInDeut ), Math.floor( resourcesConvertedInDeut ) );
+}
+
+function calcTimeProduction( production, need ) {
+	if( need === 0 ) { return 0 };
+	return convertH( need / production );
+}
+
 function convertS(s) {
   let d, h, m, w;
   m = Math.floor(s / 60);
@@ -366,6 +477,11 @@ function convertS(s) {
   if( m.length == 1) { m = "0"+m; }
   if( h.length == 1) { h = "0"+h; }
   return w + "S " + d + "J " + h + ":" + m + ":" + s;
+}
+
+function convertH(h) {
+	if( h == 0) {return 0; }
+	return precisionRound( h / 24, 1 ); 
 }
 
 function precisionRound(number, precision) {

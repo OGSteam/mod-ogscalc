@@ -376,6 +376,9 @@
         	<th><a><?php echo($lang['OGSCALC_SUM']); ?></a></th><th colspan="2" id="sum_metal_buildings"></th><th colspan="2" id="sum_crystal_buildings"></th><th colspan="2" id="sum_deut_buildings"></th><?php if( $view == "planets" ) { ?><th colspan="2" id="sum_energy_buildings"></th><?php  } ?><th colspan="2" id="sum_pt_buildings"></th><th colspan="2" id="sum_gt_buildings"></th><th colspan="2" id="sum_points_buildings"></th><th colspan="2" id="sum_time_buildings"></th>
         </tr>
         <tr>
+            <th><a><?php echo($lang['OGSCALC_TIME_PRODUCTION']); ?></a></th><th colspan="2" id="time_metal_buildings"></th><th colspan="2" id="time_crystal_buildings"></th><th colspan="2" id="time_deut_buildings"></th><th colspan="2"><a title="<?php echo($lang['OGSCALC_TIME_PRODUCTION_CONVERT_TAUX']); ?>"><?php echo($lang['OGSCALC_TIME_PRODUCTION_CONVERT']); ?></a></th><th colspan="2" id="time_convert_buildings"></th>
+        </tr>
+        <tr>
             <td class="c_satellite" colspan="<?php print ($nb_planete < 10) ? '10' : ($nb_planete + 1) * 2; ?>"><?php echo($lang['HOME_EMPIRE_OTHERS']); ?></td>
         </tr>
         <tr>
@@ -407,6 +410,9 @@
         </tr>
         <tr>
         	<th><a><?php echo($lang['OGSCALC_SUM']); ?></a></th><th colspan="2" id="sum_metal_divers">0</th><th colspan="2" id="sum_crystal_divers"></th><th colspan="2" id="sum_deut_divers"></th><th colspan="2" id="sum_pt_divers"></th><th colspan="2" id="sum_gt_divers"></th><th colspan="2" id="sum_points_divers"></th><th colspan="2" id="sum_time_divers"></th>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['OGSCALC_TIME_PRODUCTION']); ?></a></th><th colspan="2" id="time_metal_divers"></th><th colspan="2" id="time_crystal_divers"></th><th colspan="2" id="time_deut_divers"></th><th colspan="2"><a title="<?php echo($lang['OGSCALC_TIME_PRODUCTION_CONVERT_TAUX']); ?>"><?php echo($lang['OGSCALC_TIME_PRODUCTION_CONVERT']); ?></a></th><th colspan="2" id="time_convert_divers"></th>
         </tr>
         <?php if($view == "planets") { ?>
         <tr>
@@ -588,6 +594,9 @@
         <tr>
         	<th><a><?php echo($lang['OGSCALC_SUM']); ?></a></th><th colspan="2" id="sum_metal_technos"></th><th colspan="2" id="sum_crystal_technos"></th><th colspan="2" id="sum_deut_technos"></th><th colspan="2" id="sum_energy_technos"></th><th colspan="2" id="sum_pt_technos"></th><th colspan="2" id="sum_gt_technos"></th><th colspan="2" id="sum_points_technos"></th><th colspan="2" id="sum_time_technos"></th>
         </tr>
+        <tr>
+            <th><a><?php echo($lang['OGSCALC_TIME_PRODUCTION']); ?></a></th><th colspan="2" id="time_metal_technos"></th><th colspan="2" id="time_crystal_technos"></th><th colspan="2" id="time_deut_technos"></th><th colspan="2"><a title="<?php echo($lang['OGSCALC_TIME_PRODUCTION_CONVERT_TAUX']); ?>"><?php echo($lang['OGSCALC_TIME_PRODUCTION_CONVERT']); ?></a></th><th colspan="2" id="time_convert_technos"></th>
+        </tr>
         <?php } // fin de si view="planets" ?>
         <tr>
             <td class="c_defense" colspan="<?php print ($nb_planete < 10) ? '10' : ($nb_planete + 1) * 2 ?>"><?php echo($lang['HOME_EMPIRE_WEAPONS_TITLE']); ?></td>
@@ -743,6 +752,9 @@
         	<th><a><?php echo($lang['OGSCALC_SUM']); ?></a></th><th colspan="2" id="sum_metal_weapons"></th><th colspan="2" id="sum_crystal_weapons"></th><th colspan="2" id="sum_deut_weapons"></th><th colspan="2" id="sum_pt_weapons"></th><th colspan="2" id="sum_gt_weapons"></th><th colspan="2" id="sum_points_weapons"></th><th colspan="2" id="sum_time_weapons"></th>
         </tr>
         <tr>
+            <th><a><?php echo($lang['OGSCALC_TIME_PRODUCTION']); ?></a></th><th colspan="2" id="time_metal_weapons"></th><th colspan="2" id="time_crystal_weapons"></th><th colspan="2" id="time_deut_weapons"></th><th colspan="2"><a title="<?php echo($lang['OGSCALC_TIME_PRODUCTION_CONVERT_TAUX']); ?>"><?php echo($lang['OGSCALC_TIME_PRODUCTION_CONVERT']); ?></a></th><th colspan="2" id="time_convert_weapons"></th>
+        </tr>
+        <tr>
             <td class="c sumGlobal" colspan="<?php print ($nb_planete < 10) ? '10' : ($nb_planete + 1) * 2 ?>"><?php if($view == "planets") { echo($lang['OGSCALC_PLANETS_SUM']); } else { echo($lang['OGSCALC_MOONS_SUM']); } ?></td>
         </tr>       
         <tr>
@@ -750,6 +762,9 @@
         </tr>
         <tr>
         	<th><a><?php echo($lang['OGSCALC_SUM']); ?></a></th><th colspan="2" id="sum_metal"></th><th colspan="2" id="sum_crystal"></th><th colspan="2" id="sum_deut"></th><?php if( $view == "planets" ) { ?><th colspan="2" id="sum_energy"></th><?php  } ?><th colspan="2" id="sum_pt"></th><th colspan="2" id="sum_gt"></th><th colspan="2" id="sum_points"></th><th colspan="2" id="sum_time"></th>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['OGSCALC_TIME_PRODUCTION']); ?></a></th><th colspan="2" id="time_metal"></th><th colspan="2" id="time_crystal"></th><th colspan="2" id="time_deut"></th><th colspan="2"><a title="<?php echo($lang['OGSCALC_TIME_PRODUCTION_CONVERT_TAUX']); ?>"><?php echo($lang['OGSCALC_TIME_PRODUCTION_CONVERT']); ?></a></th><th colspan="2" id="time_convert"></th>
         </tr>
     </table>
 
@@ -760,6 +775,15 @@
 		var IonsLevelUser = "<?php echo $Ions = $user_technology['Ions'] != '' ? $user_technology['Ions'] : '0'; ?>";
 		var RRILevelUser = "<?php echo $Ions = $user_technology['RRI'] != '' ? $user_technology['RRI'] : '0'; ?>";
 		var view = "<?php echo $view; ?>"; 
+        var productionUser = <?php echo json_encode($user_production['reel']); ?>;
+        var metalPerHour = 0;
+        var crystalPerHour = 0;
+        var deutPerHour = 0;
+        for (var i = 0; i < Object.entries(productionUser).length; i++) {
+            metalPerHour += parseInt( Object.entries(productionUser)[i][1].M, 10 );
+            crystalPerHour += parseInt( Object.entries(productionUser)[i][1].C, 10 );
+            deutPerHour += parseInt( Object.entries(productionUser)[i][1].D, 10 );
+        }
 	</script>
 	<script type="text/javascript" src="mod/<?php echo $mod_root; ?>/js/ogameFormula.js"></script>
 	<script type="text/javascript" src="mod/<?php echo $mod_root; ?>/js/buildingsCosts.js"></script>
