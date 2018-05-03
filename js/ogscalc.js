@@ -4,6 +4,15 @@ var cSPUser = {};
 var labUser = 0;
 var capaPT = 5000;
 var capaGT = 25000;
+
+var metalRate = document.getElementById( "metal_rate" );
+var crystalRate = document.getElementById( "crystal_rate" );
+var deutRate = 1;
+
+var metalAccount = document.getElementById( "metal_resource" );
+var crystalAccount = document.getElementById( "crystal_resource" );
+var deutAccount = document.getElementById( "deut_resource" );
+
 //buildings
 var sumMetalBuildings = document.getElementById( 'sum_metal_buildings' );
 var sumCrystalBuildings = document.getElementById( 'sum_crystal_buildings' );
@@ -119,6 +128,28 @@ function getLevelsOfUser() {
 	}
 }
 
+function showProductionConverted() {
+	let metal = parseInt( document.getElementById( "metal_prod" ).textContent.replace(/\./g,''), 10 );
+	let crystal = parseInt( document.getElementById( "crystal_prod" ).textContent.replace(/\./g,''), 10 );
+	let deut = parseInt( document.getElementById( "deut_prod" ).textContent.replace(/\./g,''), 10 );
+
+	let rateMetal = parseInt( metalRate.value, 10 );
+	let rateCrystal = parseInt( crystalRate.value, 10 );
+
+	document.getElementById( "convert_prod" ).textContent = dotSeparateNumber( Math.floor( calcConvertResource( metal, crystal, deut, rateMetal, rateCrystal ) ) );
+}
+
+function showResourceConverted() {
+	let metal = parseInt( document.getElementById( "metal_resource" ).value, 10 );
+	let crystal = parseInt( document.getElementById( "crystal_resource" ).value, 10 );
+	let deut = parseInt( document.getElementById( "deut_resource" ).value, 10 );
+	console.log( deut );
+	let rateMetal = parseInt( metalRate.value, 10 );
+	let rateCrystal = parseInt( crystalRate.value, 10 );
+
+	document.getElementById( "convert_resource" ).textContent = dotSeparateNumber( Math.floor( calcConvertResource( metal, crystal, deut, rateMetal, rateCrystal ) ) );
+}
+
 function setSumToZero() {
 
 	//buildings
@@ -205,6 +236,8 @@ function initHtml() {
 	var inputs = document.getElementsByTagName('input');
 	for (var i = 0; i < inputs.length; i++) {
 		inputs[i].addEventListener("input", function (e) {
+			showProductionConverted();
+			showResourceConverted();
 	    	objectifs();
 		});
 	}
@@ -215,6 +248,8 @@ function initHtml() {
 function initOGSCalc() {
 	getLevelsOfUser();
 	initHtml();
+	showProductionConverted();
+	showResourceConverted();
 }
 
 function objectifs() {
@@ -321,6 +356,22 @@ function objectifs() {
 	//building
 	totalResourceBuilding = - totalResourceDest + costProjectBuildingM + costProjectBuildingC + costProjectBuildingD + costProjectBuildingMD + costProjectBuildingCD + costProjectBuildingDD;
 
+	if( costProjectBuildingM - parseInt( metalAccount.value, 10 ) < 0 ) {
+		costProjectBuildingM = 0;
+	} else {
+		costProjectBuildingM -= parseInt( metalAccount.value, 10 );
+	}
+	if( costProjectBuildingC - parseInt( crystalAccount.value, 10 ) < 0 ) {
+		costProjectBuildingC = 0;
+	} else {
+		costProjectBuildingC -= parseInt( crystalAccount.value, 10 );
+	}
+	if( costProjectBuildingD - parseInt( deutAccount.value, 10 ) < 0 ) {
+		costProjectBuildingD = 0;
+	} else {
+		costProjectBuildingD -= parseInt( deutAccount.value, 10 );
+	}
+
 	sumMetalBuildings.textContent = dotSeparateNumber( Math.floor(costProjectBuildingM) );
 	sumCrystalBuildings.textContent = dotSeparateNumber( Math.floor(costProjectBuildingC) );	
 	sumDeutBuildings.textContent = dotSeparateNumber( Math.floor(costProjectBuildingD) );
@@ -339,6 +390,22 @@ function objectifs() {
 	if( view === "planets" ) {
 		totalResourceTechno = costProjectTechnoM + costProjectTechnoC + costProjectTechnoD;
 
+		if( costProjectTechnoM - parseInt( metalAccount.value, 10 ) < 0 ) {
+			costProjectTechnoM = 0;
+		} else {
+			costProjectTechnoM -= parseInt( metalAccount.value, 10 );
+		}
+		if( costProjectTechnoC - parseInt( crystalAccount.value, 10 ) < 0 ) {
+			costProjectTechnoC = 0;
+		} else {
+			costProjectTechnoC -= parseInt( crystalAccount.value, 10 );
+		}
+		if( costProjectTechnoD - parseInt( deutAccount.value, 10 ) < 0 ) {
+			costProjectTechnoD = 0;
+		} else {
+			costProjectTechnoD -= parseInt( deutAccount.value, 10 );
+		}
+
 		sumMetalTechnos.textContent = dotSeparateNumber( Math.floor(costProjectTechnoM) );
 		sumCrystalTechnos.textContent = dotSeparateNumber( Math.floor(costProjectTechnoC) );	
 		sumDeutTechnos.textContent = dotSeparateNumber( Math.floor(costProjectTechnoD) );
@@ -355,6 +422,23 @@ function objectifs() {
 
 	//divers
 	totalResourceDivers = costProjectDiversM + costProjectDiversC + costProjectDiversD;
+
+	if( costProjectDiversM - parseInt( metalAccount.value, 10 ) < 0 ) {
+		costProjectDiversM = 0;
+	} else {
+		costProjectDiversM -= parseInt( metalAccount.value, 10 );
+	}
+	if( costProjectDiversC - parseInt( crystalAccount.value, 10 ) < 0 ) {
+		costProjectDiversC = 0;
+	} else {
+		costProjectDiversC -= parseInt( crystalAccount.value, 10 );
+	}
+	if( costProjectDiversD - parseInt( deutAccount.value, 10 ) < 0 ) {
+		costProjectDiversD = 0;
+	} else {
+		costProjectDiversD -= parseInt( deutAccount.value, 10 );
+	}
+
 	sumMetalDivers.textContent = dotSeparateNumber( Math.floor(costProjectDiversM) );
 	sumCrystalDivers.textContent = dotSeparateNumber( Math.floor(costProjectDiversC) );	
 	sumDeutDivers.textContent = dotSeparateNumber( Math.floor(costProjectDiversD) );
@@ -369,6 +453,23 @@ function objectifs() {
 
 	//weapons
 	totalResourceWeapon = costProjectWeaponM + costProjectWeaponC + costProjectWeaponD;
+
+	if( costProjectWeaponM - parseInt( metalAccount.value, 10 ) < 0 ) {
+		costProjectWeaponM = 0;
+	} else {
+		costProjectWeaponM -= parseInt( metalAccount.value, 10 );
+	}
+	if( costProjectWeaponC - parseInt( crystalAccount.value, 10 ) < 0 ) {
+		costProjectWeaponC = 0;
+	} else {
+		costProjectWeaponC -= parseInt( crystalAccount.value, 10 );
+	}
+	if( costProjectWeaponD - parseInt( deutAccount.value, 10 ) < 0 ) {
+		costProjectWeaponD = 0;
+	} else {
+		costProjectWeaponD -= parseInt( deutAccount.value, 10 );
+	}
+	
 	sumMetalWeapons.textContent = dotSeparateNumber( Math.floor(costProjectWeaponM) );
 	sumCrystalWeapons.textContent = dotSeparateNumber( Math.floor(costProjectWeaponC) );	
 	sumDeutWeapons.textContent = dotSeparateNumber( Math.floor(costProjectWeaponD) );
@@ -422,6 +523,22 @@ function calcPoints( res1, res2, res3 ) {
 	return res;
 }
 
+function calcConvertResource( metal, crystal, deut, metalRate, crystalRate ) {
+
+	let metalConvert = 0;
+	let crystalConvert = 0;
+
+	if( metal > 0 ) {
+		metalConvert = metal / metalRate;
+	}
+
+	if( crystal > 0 ) {
+		crystalConvert = crystal / crystalRate;
+	}
+
+	return metalConvert + crystalConvert + deut;
+}
+
 function calcTimeProductionConvert( metalResource, crystalResource, deutResource, metalProd, crystalProd, deutProd ) {
 	
 	let metalResourceConvert = 0;
@@ -432,20 +549,20 @@ function calcTimeProductionConvert( metalResource, crystalResource, deutResource
 	let prodsConvertedInDeut = 0;
 
 	if( metalResource !== 0 ) {
-		metalResourceConvert = metalResource / 3;
+		metalResourceConvert = metalResource / parseInt( metalRate.value, 10 );
 		resourcesConvertedInDeut += metalResourceConvert;
 	}
 	if( metalProd !== 0 ) {
-		metalProdConvert = metalProd / 3;
+		metalProdConvert = metalProd / parseInt( metalRate.value, 10 );
 		prodsConvertedInDeut += metalProdConvert;
 	}
 
 	if( crystalResource !== 0 ) {
-		crystalResourceConvert = crystalResource / 2;
+		crystalResourceConvert = crystalResource / parseInt( crystalRate.value, 10 );
 		resourcesConvertedInDeut += crystalResourceConvert;
 	}
 	if( crystalProd !== 0 ) {
-		crystalProdConvert = crystalProd / 2;
+		crystalProdConvert = crystalProd / parseInt( crystalRate.value, 10 );
 		prodsConvertedInDeut += crystalProdConvert;
 	}
 

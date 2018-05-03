@@ -44,6 +44,16 @@
 
 	$nb_planete = find_nb_planete_user($user_data['user_id']);
 	$name = $coordinates = $fields = $temperature_min = $temperature_max = $satellite = "";
+    
+    $prodMetal = 0;
+    $prodCrystal = 0;
+    $prodDeut = 0;
+
+    for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+        $prodMetal += $user_production['reel'][$i]['M'];
+        $prodCrystal += $user_production['reel'][$i]['C'];
+        $prodDeut += $user_production['reel'][$i]['D'];
+    }
 ?>
 	<!-- VIEW  -->
 	<style>
@@ -84,6 +94,19 @@
 
         ?>
 
+
+        <tr>
+            <td class="c" colspan="<?php print ($nb_planete < 10) ? '10' : ($nb_planete + 1) * 2 ?>"><?php echo($lang['OGSCALC_RESOURCES']); ?></td>
+        </tr>          
+        <tr>
+            <th></th><th colspan="2"><a><?php echo($lang['HOME_EMPIRE_METAL']); ?></a></th><th colspan="2"><a><?php echo($lang['HOME_EMPIRE_CRYSTAL']); ?></a></th><th colspan="2"><a><?php echo($lang['HOME_EMPIRE_DEUT']); ?></a></th><th colspan="2"><a><?php echo($lang['OGSCALC_RESOURCES_RATE']); ?></a></th><th colspan="2"><input type="number" id="metal_rate" value="3" min="1" max="9"> / <input type="number" id="crystal_rate" value="2" min="1" max="9"> / 1</th>
+        </tr>           
+        <tr>
+            <th ><a><?php echo($lang['HOME_SIMU_PRODUCTION']); ?></a></th><th id="metal_prod" colspan="2"><?php echo(number_format($prodMetal, 0, ",", ".")); ?></th><th id="crystal_prod" colspan="2"><?php echo(number_format($prodCrystal, 0, ",", ".")); ?></th><th id="deut_prod" colspan="2"><?php echo(number_format($prodDeut, 0, ",", ".")); ?></th><th id="convert_prod" colspan="2"></th>
+        </tr>           
+        <tr>
+            <th ><a><?php echo($lang['OGSCALC_RESOURCES_ACCOUNT']); ?></a></th><th colspan="2"><input type="number" class="inputOgscalc" id="metal_resource" value="0" min="0" max="999999999999"></th><th colspan="2"><input type="number" class="inputOgscalc" id="crystal_resource" value="0" min="0" max="999999999999"></th><th colspan="2"><input type="number" class="inputOgscalc" id="deut_resource" value="0" min="0" max="999999999999"></th><th id="convert_resource" colspan="2"></th>
+        </tr> 
         <tr>
             <td class="c" colspan="<?php print ($nb_planete < 10) ? '10' : ($nb_planete + 1) * 2 ?>"><?php echo($lang['HOME_EMPIRE_SUMMARY']); ?></td>
         </tr>
@@ -376,7 +399,7 @@
         	<th><a><?php echo($lang['OGSCALC_SUM']); ?></a></th><th colspan="2" id="sum_metal_buildings"></th><th colspan="2" id="sum_crystal_buildings"></th><th colspan="2" id="sum_deut_buildings"></th><?php if( $view == "planets" ) { ?><th colspan="2" id="sum_energy_buildings"></th><?php  } ?><th colspan="2" id="sum_pt_buildings"></th><th colspan="2" id="sum_gt_buildings"></th><th colspan="2" id="sum_points_buildings"></th><th colspan="2" id="sum_time_buildings"></th>
         </tr>
         <tr>
-            <th><a><?php echo($lang['OGSCALC_TIME_PRODUCTION']); ?></a></th><th colspan="2" id="time_metal_buildings"></th><th colspan="2" id="time_crystal_buildings"></th><th colspan="2" id="time_deut_buildings"></th><th colspan="2"><a title="<?php echo($lang['OGSCALC_TIME_PRODUCTION_CONVERT_TAUX']); ?>"><?php echo($lang['OGSCALC_TIME_PRODUCTION_CONVERT']); ?></a></th><th colspan="2" id="time_convert_buildings"></th>
+            <th><a><?php echo($lang['OGSCALC_TIME_PRODUCTION']); ?></a></th><th colspan="2" id="time_metal_buildings"></th><th colspan="2" id="time_crystal_buildings"></th><th colspan="2" id="time_deut_buildings"></th><th colspan="2"><a><?php echo($lang['OGSCALC_TIME_PRODUCTION_CONVERT']); ?></a></th><th colspan="2" id="time_convert_buildings"></th>
         </tr>
         <tr>
             <td class="c_satellite" colspan="<?php print ($nb_planete < 10) ? '10' : ($nb_planete + 1) * 2; ?>"><?php echo($lang['HOME_EMPIRE_OTHERS']); ?></td>
@@ -412,7 +435,7 @@
         	<th><a><?php echo($lang['OGSCALC_SUM']); ?></a></th><th colspan="2" id="sum_metal_divers">0</th><th colspan="2" id="sum_crystal_divers"></th><th colspan="2" id="sum_deut_divers"></th><th colspan="2" id="sum_pt_divers"></th><th colspan="2" id="sum_gt_divers"></th><th colspan="2" id="sum_points_divers"></th><th colspan="2" id="sum_time_divers"></th>
         </tr>
         <tr>
-            <th><a><?php echo($lang['OGSCALC_TIME_PRODUCTION']); ?></a></th><th colspan="2" id="time_metal_divers"></th><th colspan="2" id="time_crystal_divers"></th><th colspan="2" id="time_deut_divers"></th><th colspan="2"><a title="<?php echo($lang['OGSCALC_TIME_PRODUCTION_CONVERT_TAUX']); ?>"><?php echo($lang['OGSCALC_TIME_PRODUCTION_CONVERT']); ?></a></th><th colspan="2" id="time_convert_divers"></th>
+            <th><a><?php echo($lang['OGSCALC_TIME_PRODUCTION']); ?></a></th><th colspan="2" id="time_metal_divers"></th><th colspan="2" id="time_crystal_divers"></th><th colspan="2" id="time_deut_divers"></th><th colspan="2"><a><?php echo($lang['OGSCALC_TIME_PRODUCTION_CONVERT']); ?></a></th><th colspan="2" id="time_convert_divers"></th>
         </tr>
         <?php if($view == "planets") { ?>
         <tr>
@@ -595,7 +618,7 @@
         	<th><a><?php echo($lang['OGSCALC_SUM']); ?></a></th><th colspan="2" id="sum_metal_technos"></th><th colspan="2" id="sum_crystal_technos"></th><th colspan="2" id="sum_deut_technos"></th><th colspan="2" id="sum_energy_technos"></th><th colspan="2" id="sum_pt_technos"></th><th colspan="2" id="sum_gt_technos"></th><th colspan="2" id="sum_points_technos"></th><th colspan="2" id="sum_time_technos"></th>
         </tr>
         <tr>
-            <th><a><?php echo($lang['OGSCALC_TIME_PRODUCTION']); ?></a></th><th colspan="2" id="time_metal_technos"></th><th colspan="2" id="time_crystal_technos"></th><th colspan="2" id="time_deut_technos"></th><th colspan="2"><a title="<?php echo($lang['OGSCALC_TIME_PRODUCTION_CONVERT_TAUX']); ?>"><?php echo($lang['OGSCALC_TIME_PRODUCTION_CONVERT']); ?></a></th><th colspan="2" id="time_convert_technos"></th>
+            <th><a><?php echo($lang['OGSCALC_TIME_PRODUCTION']); ?></a></th><th colspan="2" id="time_metal_technos"></th><th colspan="2" id="time_crystal_technos"></th><th colspan="2" id="time_deut_technos"></th><th colspan="2"><a><?php echo($lang['OGSCALC_TIME_PRODUCTION_CONVERT']); ?></a></th><th colspan="2" id="time_convert_technos"></th>
         </tr>
         <?php } // fin de si view="planets" ?>
         <tr>
@@ -752,7 +775,7 @@
         	<th><a><?php echo($lang['OGSCALC_SUM']); ?></a></th><th colspan="2" id="sum_metal_weapons"></th><th colspan="2" id="sum_crystal_weapons"></th><th colspan="2" id="sum_deut_weapons"></th><th colspan="2" id="sum_pt_weapons"></th><th colspan="2" id="sum_gt_weapons"></th><th colspan="2" id="sum_points_weapons"></th><th colspan="2" id="sum_time_weapons"></th>
         </tr>
         <tr>
-            <th><a><?php echo($lang['OGSCALC_TIME_PRODUCTION']); ?></a></th><th colspan="2" id="time_metal_weapons"></th><th colspan="2" id="time_crystal_weapons"></th><th colspan="2" id="time_deut_weapons"></th><th colspan="2"><a title="<?php echo($lang['OGSCALC_TIME_PRODUCTION_CONVERT_TAUX']); ?>"><?php echo($lang['OGSCALC_TIME_PRODUCTION_CONVERT']); ?></a></th><th colspan="2" id="time_convert_weapons"></th>
+            <th><a><?php echo($lang['OGSCALC_TIME_PRODUCTION']); ?></a></th><th colspan="2" id="time_metal_weapons"></th><th colspan="2" id="time_crystal_weapons"></th><th colspan="2" id="time_deut_weapons"></th><th colspan="2"><a><?php echo($lang['OGSCALC_TIME_PRODUCTION_CONVERT']); ?></a></th><th colspan="2" id="time_convert_weapons"></th>
         </tr>
         <tr>
             <td class="c sumGlobal" colspan="<?php print ($nb_planete < 10) ? '10' : ($nb_planete + 1) * 2 ?>"><?php if($view == "planets") { echo($lang['OGSCALC_PLANETS_SUM']); } else { echo($lang['OGSCALC_MOONS_SUM']); } ?></td>
@@ -764,7 +787,7 @@
         	<th><a><?php echo($lang['OGSCALC_SUM']); ?></a></th><th colspan="2" id="sum_metal"></th><th colspan="2" id="sum_crystal"></th><th colspan="2" id="sum_deut"></th><?php if( $view == "planets" ) { ?><th colspan="2" id="sum_energy"></th><?php  } ?><th colspan="2" id="sum_pt"></th><th colspan="2" id="sum_gt"></th><th colspan="2" id="sum_points"></th><th colspan="2" id="sum_time"></th>
         </tr>
         <tr>
-            <th><a><?php echo($lang['OGSCALC_TIME_PRODUCTION']); ?></a></th><th colspan="2" id="time_metal"></th><th colspan="2" id="time_crystal"></th><th colspan="2" id="time_deut"></th><th colspan="2"><a title="<?php echo($lang['OGSCALC_TIME_PRODUCTION_CONVERT_TAUX']); ?>"><?php echo($lang['OGSCALC_TIME_PRODUCTION_CONVERT']); ?></a></th><th colspan="2" id="time_convert"></th>
+            <th><a><?php echo($lang['OGSCALC_TIME_PRODUCTION']); ?></a></th><th colspan="2" id="time_metal"></th><th colspan="2" id="time_crystal"></th><th colspan="2" id="time_deut"></th><th colspan="2"><a><?php echo($lang['OGSCALC_TIME_PRODUCTION_CONVERT']); ?></a></th><th colspan="2" id="time_convert"></th>
         </tr>
     </table>
 
@@ -776,14 +799,9 @@
 		var RRILevelUser = "<?php echo $Ions = $user_technology['RRI'] != '' ? $user_technology['RRI'] : '0'; ?>";
 		var view = "<?php echo $view; ?>"; 
         var productionUser = <?php echo json_encode($user_production['reel']); ?>;
-        var metalPerHour = 0;
-        var crystalPerHour = 0;
-        var deutPerHour = 0;
-        for (var i = 0; i < Object.entries(productionUser).length; i++) {
-            metalPerHour += parseInt( Object.entries(productionUser)[i][1].M, 10 );
-            crystalPerHour += parseInt( Object.entries(productionUser)[i][1].C, 10 );
-            deutPerHour += parseInt( Object.entries(productionUser)[i][1].D, 10 );
-        }
+        var metalPerHour = parseInt(<?php echo $prodMetal; ?>, 10);
+        var crystalPerHour = parseInt(<?php echo $prodCrystal; ?>, 10);
+        var deutPerHour = parseInt(<?php echo $prodDeut; ?>, 10);
 	</script>
 	<script type="text/javascript" src="mod/<?php echo $mod_root; ?>/js/ogameFormula.js"></script>
 	<script type="text/javascript" src="mod/<?php echo $mod_root; ?>/js/buildingsCosts.js"></script>
