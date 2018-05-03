@@ -49,7 +49,7 @@
     $prodCrystal = 0;
     $prodDeut = 0;
 
-    for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+    for ($i = 101; $i <= 101 + $nb_planete - 1; $i++) {
         $prodMetal += $user_production['reel'][$i]['M'];
         $prodCrystal += $user_production['reel'][$i]['C'];
         $prodDeut += $user_production['reel'][$i]['D'];
