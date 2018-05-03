@@ -16,5 +16,5 @@
 
 - Same view as empire
 - Manage destruction of buildings
-
+- Show time of production
 
