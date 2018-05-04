@@ -105,7 +105,7 @@
             <th ><a><?php echo($lang['HOME_SIMU_PRODUCTION']); ?></a></th><th id="metal_prod" colspan="2"><?php echo(number_format($prodMetal, 0, ",", ".")); ?></th><th id="crystal_prod" colspan="2"><?php echo(number_format($prodCrystal, 0, ",", ".")); ?></th><th id="deut_prod" colspan="2"><?php echo(number_format($prodDeut, 0, ",", ".")); ?></th><th id="convert_prod" colspan="2"></th>
         </tr>           
         <tr>
-            <th ><a><?php echo($lang['OGSCALC_RESOURCES_ACCOUNT']); ?></a></th><th colspan="2"><input type="text" class="inputOgscalc" id="metal_resource" maxlength="12" value="0" ></th><th colspan="2"><input type="text" class="inputOgscalc" id="crystal_resource" maxlength="12" value="0" ></th><th colspan="2"><input type="text" class="inputOgscalc" id="deut_resource" maxlength="12" value="0" ></th><th id="convert_resource" colspan="2"></th>
+            <th ><a><?php echo($lang['OGSCALC_RESOURCES_ACCOUNT']); ?></a></th><th colspan="2"><input type="text" class="inputOgscalc" id="metal_resource" value="0" ></th><th colspan="2"><input type="text" class="inputOgscalc" id="crystal_resource" value="0" ></th><th colspan="2"><input type="text" class="inputOgscalc" id="deut_resource" value="0" ></th><th id="convert_resource" colspan="2"></th>
         </tr> 
         <tr>
             <td class="c" colspan="<?php print ($nb_planete < 10) ? '10' : ($nb_planete + 1) * 2 ?>"><?php echo($lang['HOME_EMPIRE_SUMMARY']); ?></td>
