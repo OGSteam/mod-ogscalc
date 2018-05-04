@@ -1,0 +1,17 @@
+.inputOgscalc {
+	width: 60px;
+}
+
+.inputOgscalc.rate {
+	width: 20px;
+}
+
+td.sum  {
+	border-color: green;
+	color: green;
+}
+
+td.sumGlobal  {
+	border-color: red;
+	color: red;
+}

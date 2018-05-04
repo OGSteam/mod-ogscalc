@@ -5,596 +5,831 @@
 * @package Calculatrice universelle
 * @author Aeris
 * @update xaviernuma - 2016
+* @update Choubakawa - 2018
 * @link http://www.ogsteam.fr/
 **/
 
-if (!defined('IN_SPYOGAME'))
-{ 
-	die("Hacking attempt");
-}
+	if (!defined('IN_SPYOGAME'))
+	{ 
+		die("Hacking attempt");
+	}
 
-require_once("views/page_header.php");
+	require_once("views/page_header.php");
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+	error_reporting(E_ALL);
+	ini_set('display_errors', 1);
 
-$ta_resultat = $db->sql_query('SELECT `version`, `root` FROM `'.TABLE_MOD.'` WHERE `action`="'.$pub_action.'" AND `active`= 1');
+	$ta_resultat = $db->sql_query('SELECT `version`, `root` FROM `'.TABLE_MOD.'` WHERE `action`="'.$pub_action.'" AND `active`= 1');
 
-if(!$db->sql_numrows($ta_resultat))
-{
-	die('Mod désactivé !');
-}
-
-list ( $mod_version, $mod_root ) = $db->sql_fetch_row($ta_resultat);
-
-$s_html = ''; 
-$user_empire = user_get_empire($user_data['user_id']);
-$user_building = $user_empire["building"];
-$user_technology = $user_empire["technology"];
-$vitesse = $server_config['speed_uni'];
-$s_html .= '<script type="text/javascript" src="mod/'.$mod_root.'/formule.js"></script>';
-$s_html .= '<script type="text/javascript">';
-$s_html .= 'var vitesse_univers = '.$vitesse.';';
-
-$i = 0;
-foreach($user_building as $ta_une_planete)
-{
-	if ($ta_une_planete['planet_name'] <> '')
+	if(!$db->sql_numrows($ta_resultat))
 	{
-		$s_html .= "batimentsOGSpy[".$i."]= new Array('".
-				$ta_une_planete['planet_name']."','".
-				$ta_une_planete['M']."','".
-				$ta_une_planete['C']."','".
-				$ta_une_planete['D']."','".
-				$ta_une_planete['CES']."','".
-				$ta_une_planete['CEF']."','".
-				$ta_une_planete['UdR']."','".
-				$ta_une_planete['UdN']."','".
-				$ta_une_planete['CSp']."','".
-				$ta_une_planete['HM']."','".
-				$ta_une_planete['HC']."','".
-				$ta_une_planete['HD']."','".
-				$ta_une_planete['Lab']."','".
-				$ta_une_planete['Silo']."','".
-				$ta_une_planete['Ter']."','".
-				$ta_une_planete['BaLu']."','".
-				$ta_une_planete['Pha']."','".
-				$ta_une_planete['PoSa']."','".
-				$ta_une_planete['DdR']."');";
-		if($i == 0)
-		{
-			foreach($ta_une_planete as $key => $value)
-			{
-				$ta_premiere_planete[$key] = $value;
-			}
-		}
-		$i++;		
+		die('Mod désactivé !');
 	}
-}
 
-$s_html .= "technologiesOGSpy = new Array('".
-		$user_technology['Esp']."','".
-		$user_technology['Ordi']."','".
-		$user_technology['Armes']."','".
-		$user_technology['Bouclier']."','".
-		$user_technology['Protection']."','".
-		$user_technology['NRJ']."','".
-		$user_technology['Hyp']."','".
-		$user_technology['RC']."','".
-		$user_technology['RI']."','".
-		$user_technology['PH']."','".
-		$user_technology['Laser']."','".
-		$user_technology['Ions']."','".
-		$user_technology['Plasma']."','".
-		$user_technology['RRI']."','".
-		$user_technology['Astrophysique']."','".
-		$user_technology['Graviton']."');";
+	list ( $mod_version, $mod_root ) = $db->sql_fetch_row($ta_resultat);
 
-$s_html .= '</script>';
+	require_once( "mod/".$mod_root."/lang/fr/lang.php" );
 
-$s_html .= 		'<input type="hidden" value="mod/'.$mod_root.'/" id="root" />';
-$s_html .= 		'<table>';
-$s_html .= 			'<tr>';
-$s_html .= 				'<td class="c" style="text-align:center">Planète de développement :</td><th>';
-$s_html .= 					'<select id="planete" onchange="javascript:chargement(this.options[this.selectedIndex].value);">';
+	/*INIT VALUES*/
+	$user_empire = user_get_empire($user_data['user_id']);
+	$user_building = $user_empire["building"];
+	$user_defence = $user_empire["defence"];
+	$user_technology = $user_empire["technology"];
+	$user_production = user_empire_production($user_empire,$user_data);
 
-$i = 0;
-foreach($user_building as $ta_une_planete)
-{
-	if($ta_une_planete['planet_name'] <> '')
-	{
-		$s_html .= 	'<option value="'.$i.'">';
-		$s_html .= 		$ta_une_planete['planet_name'].' ['.$ta_une_planete['coordinates'].']';
-		$s_html .= 	'</option>';
-		$i++;
-	}
-}
-$s_html .= 					'</select>';
-$s_html .= 					'</th>';
-$s_html .= 			'</tr></table>';
+	if (!isset($pub_view) || $pub_view == "") $view = "planets";
+	elseif ($pub_view == "planets" || $pub_view == "moons") $view = $pub_view;
+	else $view = "planets";
+	$start = $view == "planets" ? 101 : 201;
 
-$s_html .= '<fieldset>';
-$s_html .= 		'<legend><img src="mod/'.$mod_root.'/moins.png" style="cursor:pointer;" alt="moins" onclick="javascript:f_inverse(\'deroulant_technologies\', this)" /> Vos technologies</legend>';
-$s_html .= 		'<div id="deroulant_technologies" style="display:block;">';
-$s_html .= 		'<table>';
-$s_html .= 			'<tr>';
-$s_html .= 				'<td class="c" style="text-align:center">Laboratoires de recherche :</td><th><input type="text" id="labopm" size="2" maxlength="2" value="'.$ta_premiere_planete['Lab'].'" onkeyup="javascript:laboEqui()"></th>';
-$s_html .= 				'<td class="c" style="text-align:center">Chantier spatial :</td><th><input type="text" id="chantier" size="2" maxlength="2" value="'.$ta_premiere_planete['CSp'].'" onkeyup="javascript:rafraichiChantier()"></th>';
-$s_html .= 			'</tr><tr>';
-$s_html .= 				'<td class="c" style="text-align:center">Usine de robot :</td><th><input type="text" id="robot" size="2" maxlength="2" value="'.$ta_premiere_planete['UdR'].'" onkeyup="javascript:rafraichiRobot()"></th>';
-$s_html .= 				'<td class="c" style="text-align:center">Usine de nanites :</td><th><input type="text" id="nanite" size="2" maxlength="2" value="'.$ta_premiere_planete['UdN'].'" onkeyup="javascript:rafraichiRobot();rafraichiChantier()"></th>';
-$s_html .= 			'</tr><tr>';
-$s_html .= 				'<td class="c" style="text-align:center">Réseau de recherche intergalactique :</td><th><input type="text" id="reseau" size="2" maxlength="2" value="'.$user_technology['RRI'].'" onkeyup="javascript:laboEqui()"></th>';
-$i = 0;
-$n_laboratoire_equivalent = 0;
-$t_labo = Array();
+	$nb_planete = find_nb_planete_user($user_data['user_id']);
+	$name = $coordinates = $fields = $temperature_min = $temperature_max = $satellite = "";
+    
+    $prodMetal = 0;
+    $prodCrystal = 0;
+    $prodDeut = 0;
 
-foreach($user_building as $ta_une_planete)
-{
-	if ($ta_une_planete['planet_name'] <> '')
-	{
-		$t_labo[$i] = $ta_une_planete['Lab'];
-		$i++;
-	}
-}
-
-arsort($t_labo);
-
-$i = 0;
-foreach($t_labo as $n_un_labo)
-{
-	if($n_un_labo >= 7)
-	{	
-		if(($user_technology['RRI'] + 1) > $i)
-		{
-			$n_laboratoire_equivalent += intval($n_un_labo);
-			$i++;
-		}
-	}
-}
-
-$s_html .= 				'<td class="c" style="text-align:center">Laboratoire équivalent :</td><th><input type="text" id="laboequi" size="4" maxlength="2" readonly value="'.$n_laboratoire_equivalent.'"></th>';
-$s_html .= 			'</tr>';
-$s_html .= 		'</table>';
-$s_html .= 		'</div>';
-$s_html .= '</fieldset>';
-
-$s_html .= '<fieldset>';
-$s_html .= 		'<legend><img src="mod/'.$mod_root.'/moins.png" style="cursor:pointer;" alt="moins" onclick="javascript:f_inverse(\'deroulant_total\', this)" /> Total</legend>';
-$s_html .= 		'<div id="deroulant_total" style="display:block;">';
-$s_html .= 		'<table>';
-$s_html .= 			'<tr><td class="c" style="text-align:center">';
-$s_html .= 				'Métal requis</td><td class="c" style="text-align:center">';
-$s_html .= 				'Cristal requis</td><td class="c" style="text-align:center">';
-$s_html .= 				'Deutérium requis</td><td class="c" style="text-align:center">';
-$s_html .= 				'Durée de construction</td>';
-$s_html .= 				'</tr>';
-$s_html .= 			'<tr><th>';
-$s_html .= 				'<input type="hidden" id="total_metal" value="0" /><input type="text" id="total_metal_resultat" size="15" readonly value="0" /></th><th>';
-$s_html .= 				'<input type="hidden" id="total_cristal" value="0" /><input type="text" id="total_cristal_resultat" size="15" readonly value="0" /></th><th>';
-$s_html .= 				'<input type="hidden" id="total_deuterium" value="0" /><input type="text" id="total_deuterium_resultat" size="15" readonly value="0" /></th><th>';
-$s_html .= 				'<input type="text" id="total_temps" size="15" readonly value="-">';
-$s_html .= 				'<input type="hidden" id="total_sec" value="0"></th>';
-$s_html .= 			'</tr><tr><td colspan="7" class="c">';
-$s_html .= 				'un total de <span id="total_ressources" style="color:#FF0080;font-weight:bold;">';
-$s_html .= 				'0</span> ressources, soit <span id="total_pt" style="color:#0080FF;font-weight:bold;">';
-$s_html .= 				'0</span> PT ou <span id="total_gt" style="color:#80FF00;font-weight:bold;">';
-$s_html .= 				'0</span> GT';
-$s_html .= 			'</td></tr>';
-$s_html .= 		'</table>';
-$s_html .= 		'</div>';
-$s_html .= '</fieldset>';
-
-// Bâtiments
-
-$s_html_batiments = '';
-
-// 0 = parametre ; 1 = lettre ; 2 = code ; 3 = nom
-$ta_batiments[0] = Array ('60, 15, 0, 1.5', 'M', 'mine_metal', 'Mine de métal');
-$ta_batiments[1] = Array ('48,24,0,1.6', 'C', 'mine_cristal', 'Mine de cristal');
-$ta_batiments[2] = Array ('225,75,0,1.5', 'D', 'synthetiseur_deuterium', 'Synthétiseur de deutérium');
-$ta_batiments[3] = Array ('75,30,0,1.5', 'CES', 'centrale_solaire', 'Centrale électrique solaire');
-$ta_batiments[4] = Array ('900,360,180,1.8', 'CEF', 'reacteur_fusion', 'Centrale électrique de fusion');
-$ta_batiments[5] = Array ('1000,0,0,2', 'HM', 'hangar_metal', 'Hangar de métal');
-$ta_batiments[6] = Array ('1000,500,0,2', 'HC', 'hangar_cristal', 'Hangar de cristal');
-$ta_batiments[7] = Array ('1000,1000,0,2', 'HD', 'reservoir_deuterium', 'Réservoir de deutérium');
-$ta_batiments[8] = Array ('400,120,200,2', 'UdR', 'usine_robots', 'Usine de robots');
-$ta_batiments[9] = Array ('1000000,500000,100000,2', 'UdN', 'usine_nanites', 'Usine de nanites');
-$ta_batiments[10] = Array ('400,200,100,2', 'CSp', 'chantier_spatial', 'Chantier spatial');
-$ta_batiments[11] = Array ('200,400,200,2', 'Lab', 'laboratoire', 'Laboratoire de recherche');
-$ta_batiments[12] = Array ('20000,20000,1000,2', 'Silo', 'silo_missiles', 'Silo de missiles');
-$ta_batiments[13] = Array ('1000,50000,100000,2', 'Ter', 'terraformeur', 'Terraformeur');
-
-for($i = 0 ; $i < count($ta_batiments) ; $i++)
-{
-	$s_html_batiments .= '<tr>';
-	$s_html_batiments .= 	'<th>'.$ta_batiments[$i][3].'</th>';
-	$s_html_batiments .= 	'<th><input type="text" id="'.$ta_batiments[$i][2].'_actuel" size="2" maxlength="2" onkeyup="javascript:batiment(\''.$ta_batiments[$i][2].'\', '.$ta_batiments[$i][0].');" value="'.$ta_premiere_planete[$ta_batiments[$i][1]].'" /></th>';
-	$s_html_batiments .= 	'<th><input type="text" id="'.$ta_batiments[$i][2].'_voulu" size="2" maxlength="2" onkeyup="javascript:batiment(\''.$ta_batiments[$i][2].'\', '.$ta_batiments[$i][0].')" value="'.$ta_premiere_planete[$ta_batiments[$i][1]].'" /></th>';
-	$s_html_batiments .= 	'<th><input type="hidden" id="'.$ta_batiments[$i][2].'_metal" value="0" /><input type="text" id="'.$ta_batiments[$i][2].'_metal_resultat" size="15" readonly value="0" /></th>';
-	$s_html_batiments .= 	'<th><input type="hidden" id="'.$ta_batiments[$i][2].'_cristal" value="0" /><input type="text" id="'.$ta_batiments[$i][2].'_cristal_resultat" size="15" readonly value="0" /></th>';
-	$s_html_batiments .= 	'<th><input type="hidden" id="'.$ta_batiments[$i][2].'_deuterium" value="0" /><input type="text" id="'.$ta_batiments[$i][2].'_deuterium_resultat" size="15" readonly value="0" /></th>';
-	$s_html_batiments .= 	'<th><input type="text" id="'.$ta_batiments[$i][2].'_temps" size="15" readonly value="-" />';
-	$s_html_batiments .= 	'<input type="hidden" id="'.$ta_batiments[$i][2].'_sec" value="0" /></th>';
-	$s_html_batiments .= '</tr>';
-}
-
-$s_html .= '<fieldset>';
-$s_html .= 		'<legend><img src="mod/'.$mod_root.'/moins.png" style="cursor:pointer;" alt="moins" onclick="javascript:f_inverse(\'deroulant_batiment\', this)" /> Bâtiments</legend>';
-$s_html .= 		'<div id="deroulant_batiment" style="display:block;">';
-$s_html .= 		'<table>';
-$s_html .= 			'<tr><td class="c" style="text-align:center">';
-$s_html .= 				'Nom</td><td class="c" style="text-align:center">';
-$s_html .= 				'Niveau actuel</td><td class="c" style="text-align:center">';
-$s_html .= 				'Niveau voulu</td><td class="c" style="text-align:center">';
-$s_html .= 				'Métal requis</td><td class="c" style="text-align:center">';
-$s_html .= 				'Cristal requis</td><td class="c" style="text-align:center">';
-$s_html .= 				'Deutérium requis</td><td class="c" style="text-align:center">';
-$s_html .= 				'Durée de construction</td>';
-$s_html .= 			'</tr>';
-$s_html .= 			$s_html_batiments;
-$s_html .= 			'<tr><td class="c" style="text-align:center" colspan="3">';
-$s_html .= 				'Total</td><th>';
-$s_html .= 				'<input type="hidden" id="batiments_metal" value="0"><input type="text" id="batiments_metal_resultat" size="15" readonly value="0"></th><th>';
-$s_html .= 				'<input type="hidden" id="batiments_cristal" value="0"><input type="text" id="batiments_cristal_resultat" size="15" readonly value="0"></th><th>';
-$s_html .= 				'<input type="hidden" id="batiments_deuterium" value="0"><input type="text" id="batiments_deuterium_resultat" size="15" readonly value="0"></th><th>';
-$s_html .= 				'<input type="text" id="batiments_temps" size="15" readonly value="-">';
-$s_html .= 				'<input type="hidden" id="batiments_sec" value="0"></th>';
-$s_html .= 			'</tr><tr><td colspan="7" class="c">';
-$s_html .= 				'Un total de <span id="batiments_ressources" style="color:#FF0080;font-weight:bold;">';
-$s_html .= 				'0</span> ressources, soit <span id="batiments_pt" style="color:#0080FF;font-weight:bold;">';
-$s_html .= 				'0</span> PT ou <span id="batiments_gt" style="color:#80FF00;font-weight:bold;">';
-$s_html .= 				'0</span> GT';
-$s_html .= 			'</td></tr>';
-$s_html .= 		'</table>';
-$s_html .= 		'</div>';
-$s_html .= '</fieldset>';
-
-// Bâtiments spéciaux
-
-$s_html_batiments_speciaux = '';
-
-// 0 = parametre ; 1 = lettre ; 2 = code ; 3 = nom
-$ta_batiments_speciaux[0] = Array ('20000,40000,20000,2', 'BaLu', 'base_lunaire', 'Base lunaire');
-$ta_batiments_speciaux[1] = Array ('20000,40000,20000,2', 'Pha', 'phalange_capteurs', 'Phalange de capteur');
-$ta_batiments_speciaux[2] = Array ('2000000,4000000,2000000,2', 'PoSa', 'porte_saut_spatial', 'Porte de saut spatial');
-$ta_batiments_speciaux[3] = Array ('20000,40000,0,2', 'DdR', 'depot_ravitaillement', 'Dépôt de ravitaillement');
-
-for($i = 0 ; $i < count($ta_batiments_speciaux) ; $i++)
-{
-	$s_html_batiments_speciaux .= 			'<tr>';
-	$s_html_batiments_speciaux .= 				'<th>'.$ta_batiments_speciaux[$i][3].'</th>';
-	$s_html_batiments_speciaux .= 				'<th><input type="text" id="'.$ta_batiments_speciaux[$i][2].'_actuel" size="2" maxlength="2" onkeyup="javascript:batimentSpeciaux(\''.$ta_batiments_speciaux[$i][2].'\', '.$ta_batiments_speciaux[$i][0].');" value="'.$ta_premiere_planete[$ta_batiments_speciaux[$i][1]].'" /></th>';
-	$s_html_batiments_speciaux .= 				'<th><input type="text" id="'.$ta_batiments_speciaux[$i][2].'_voulu" size="2" maxlength="2" onkeyup="javascript:batimentSpeciaux(\''.$ta_batiments_speciaux[$i][2].'\', '.$ta_batiments_speciaux[$i][0].')" value="'.$ta_premiere_planete[$ta_batiments_speciaux[$i][1]].'" /></th>';
-	$s_html_batiments_speciaux .= 				'<th><input type="hidden" id="'.$ta_batiments_speciaux[$i][2].'_metal" value="0" /><input type="text" id="'.$ta_batiments_speciaux[$i][2].'_metal_resultat" size="15" readonly value="0" /></th>';
-	$s_html_batiments_speciaux .= 				'<th><input type="hidden" id="'.$ta_batiments_speciaux[$i][2].'_cristal" value="0" /><input type="text" id="'.$ta_batiments_speciaux[$i][2].'_cristal_resultat" size="15" readonly value="0" /></th>';
-	$s_html_batiments_speciaux .= 				'<th><input type="hidden" id="'.$ta_batiments_speciaux[$i][2].'_deuterium" value="0" /><input type="text" id="'.$ta_batiments_speciaux[$i][2].'_deuterium_resultat" size="15" readonly value="0" /></th>';
-	$s_html_batiments_speciaux .= 				'<th><input type="text" id="'.$ta_batiments_speciaux[$i][2].'_temps" size="15" readonly value="-" />';
-	$s_html_batiments_speciaux .= 				'<input type="hidden" id="'.$ta_batiments_speciaux[$i][2].'_sec" value="0" /></th>';
-	$s_html_batiments_speciaux .= 			'</tr>';
-}
-
-$s_html .= '<fieldset>';
-$s_html .= 		'<legend><img src="mod/'.$mod_root.'/moins.png" style="cursor:pointer;" alt="moins" onclick="javascript:f_inverse(\'deroulant_speciaux\', this)" /> Bâtiments spéciaux</legend>';
-$s_html .= 		'<div id="deroulant_speciaux" style="display:block;">';
-$s_html .=		'<table>';
-$s_html .= 			'<tr><td class="c" style="text-align:center">';
-$s_html .= 				'Nom</td><td class="c" style="text-align:center">';
-$s_html .= 				'Niveau actuel</td><td class="c" style="text-align:center">';
-$s_html .= 				'Niveau voulu</td><td class="c" style="text-align:center">';
-$s_html .= 				'Métal requis</td><td class="c" style="text-align:center">';
-$s_html .= 				'Cristal requis</td><td class="c" style="text-align:center">';
-$s_html .= 				'Deutérium requis</td><td class="c" style="text-align:center">';
-$s_html .= 				'Durée de construction</td>';
-$s_html .= 			'</tr>';
-$s_html .=			$s_html_batiments_speciaux;
-$s_html .= 			'<tr><td class="c" style="text-align:center" colspan="3">';
-$s_html .= 				'Total</td><th>';
-$s_html .= 				'<input type="hidden" id="batiments_speciaux_metal" value="0" /><input type="text" id="batiments_speciaux_metal_resultat" size="15" readonly value="0" /></th><th>';
-$s_html .= 				'<input type="hidden" id="batiments_speciaux_cristal" value="0" /><input type="text" id="batiments_speciaux_cristal_resultat" size="15" readonly value="0" /></th><th>';
-$s_html .= 				'<input type="hidden" id="batiments_speciaux_deuterium" value="0" /><input type="text" id="batiments_speciaux_deuterium_resultat" size="15" readonly value="0" /></th><th>';
-$s_html .= 				'<input type="text" id="batiments_speciaux_temps" size="15" readonly value="-">';
-$s_html .= 				'<input type="hidden" id="batiments_speciaux_sec" value="0"></th>';
-$s_html .= 			'</tr>';
-$s_html .= 			'<tr>';
-$s_html .= 				'<td colspan="7" class="c">';
-$s_html .= 					'Un total de <span id="batiments_speciaux_ressources" style="color:#FF0080;font-weight:bold;">';
-$s_html .= 					'0</span> ressources, soit <span id="batiments_speciaux_pt" style="color:#0080FF;font-weight:bold;">';
-$s_html .= 					'0</span> PT ou <span id="batiments_speciaux_gt" style="color:#80FF00;font-weight:bold;">';
-$s_html .= 					'0</span> GT';
-$s_html .= 				'</td>';
-$s_html .= 			'</tr>';
-$s_html .= 		'</table>';
-$s_html .= 		'</div>';
-$s_html .= '</fieldset>';
-
-// Technologies
-
-$s_html_technologie = '';
-
-// 0 = parametre ; 1 = lettre ; 2 = code ; 3 = nom
-$ta_technologies[0] = Array ('200,1000,200,2', 'Esp', 'espionnage', 'Technologie Espionnage');
-$ta_technologies[1] = Array ('0,400,600,2', 'Ordi', 'ordinateur', 'Technologie Ordinateur');
-$ta_technologies[2] = Array ('800,200,0,2', 'Armes', 'armes', 'Technologie Armes');
-$ta_technologies[3] = Array ('200,600,0,2', 'Bouclier', 'bouclier', 'Technologie Bouclier');
-$ta_technologies[4] = Array ('1000,0,0,2', 'Protection', 'protection_vaisseaux', 'Technologie Protection des vaisseaux spatiaux');
-$ta_technologies[5] = Array ('0,800,400,2', 'NRJ', 'energie', 'Technologie énergie');
-$ta_technologies[6] = Array ('0,4000,2000,2', 'Hyp', 'hyperespace', 'Technologie hyperespace');
-$ta_technologies[7] = Array ('400,0,600,2', 'RC', 'reacteur_combustion', 'Réacteur à combustion');
-$ta_technologies[8] = Array ('2000,4000,600,2', 'RI', 'reacteur_impulsion', 'Réacteur à impulsion');
-$ta_technologies[9] = Array ('10000,20000,6000,2', 'PH', 'propulsion_hyperespace', 'Propulsion hyperespace');
-$ta_technologies[10] = Array ('200,100,0,2', 'Laser', 'laser', 'Technologie Laser');
-$ta_technologies[11] = Array ('1000,300,100,2', 'Ions', 'ion', 'Technologie Ions');
-$ta_technologies[12] = Array ('2000,4000,1000,2', 'Plasma', 'plasma', 'Technologie Plasma');
-$ta_technologies[13] = Array ('240000,400000,160000,2', 'RRI', 'reseau_recherche', 'Réseau de recherche intergalactique');
-$ta_technologies[14] = Array ('4000,8000,4000,1.75', 'Astrophysique', 'expeditions', 'Astrophysique');
-
-for($i = 0 ; $i < count($ta_technologies) ; $i++)
-{
-	$s_html_technologie .= '<tr>';
-	$s_html_technologie .= 	'<th>'.$ta_technologies[$i][3].'</th>';
-	$s_html_technologie .= 	'<th><input type="text" id="'.$ta_technologies[$i][2].'_actuel" size="2" maxlength="2" onkeyup="javascript:technologie(\''.$ta_technologies[$i][2].'\', '.$ta_technologies[$i][0].');" value="'.$user_technology[$ta_technologies[$i][1]].'" /></th>';	
-	$s_html_technologie .= 	'<th><input type="text" id="'.$ta_technologies[$i][2].'_voulu" size="2" maxlength="2" onkeyup="javascript:technologie(\''.$ta_technologies[$i][2].'\', '.$ta_technologies[$i][0].')" value="'.$user_technology[$ta_technologies[$i][1]].'" /></th>';
-	$s_html_technologie .= 	'<th><input type="hidden" id="'.$ta_technologies[$i][2].'_metal" value="0" /><input type="text" id="'.$ta_technologies[$i][2].'_metal_resultat" size="15" readonly value="0" /></th>';
-	$s_html_technologie .= 	'<th><input type="hidden" id="'.$ta_technologies[$i][2].'_cristal" value="0" /><input type="text" id="'.$ta_technologies[$i][2].'_cristal_resultat" size="15" readonly value="0" /></th>';
-	$s_html_technologie .= 	'<th><input type="hidden" id="'.$ta_technologies[$i][2].'_deuterium" value="0" /><input type="text" id="'.$ta_technologies[$i][2].'_deuterium_resultat" size="15" readonly value="0" /></th>';
-	$s_html_technologie .= 	'<th><input type="text" id="'.$ta_technologies[$i][2].'_temps" size="15" readonly value="-" />';
-	$s_html_technologie .= 	'<input type="hidden" id="'.$ta_technologies[$i][2].'_sec" value="0" /></th>';
-	$s_html_technologie .= '</tr>';
-}
-
-$s_html .= '<fieldset>';
-$s_html .= 		'<legend><img src="mod/'.$mod_root.'/moins.png" style="cursor:pointer;" alt="moins" onclick="javascript:f_inverse(\'deroulant_technologie\', this)" /> Technologies</legend>';
-$s_html .= 		'<div id="deroulant_technologie" style="display:block;">';
-$s_html .= 		'<table>';
-$s_html .= 			'<tr><td class="c" style="text-align:center">';
-$s_html .= 				'Nom</td><td class="c" style="text-align:center">';
-$s_html .= 				'Niveau actuel</td><td class="c" style="text-align:center">';
-$s_html .= 				'Niveau voulu</td><td class="c" style="text-align:center">';
-$s_html .= 				'Métal requis</td><td class="c" style="text-align:center">';
-$s_html .= 				'Cristal requis</td><td class="c" style="text-align:center">';
-$s_html .= 				'Deutérium requis</td><td class="c" style="text-align:center">';
-$s_html .= 				'Durée de construction</td>';
-$s_html .= 			'</tr>';
-$s_html .=			$s_html_technologie;
-$s_html .= 			'<tr><th>';
-$s_html .= 				'Technologie Graviton</th><th>';
-$s_html .= 				'<input type="text" id="graviton_actuel" size="2" maxlength="2" onkeyup="javascript:graviton();" value="'.$user_technology['Graviton'].'"></th><th>';
-$s_html .= 				'<input type="text" id="graviton_voulu" size="2" maxlength="2" onkeyup="javascript:graviton();" value="'.$user_technology['Graviton'].'"></th><th colspan="3">';
-$s_html .= 				'Energie : <input type="text" id="graviton" size="15" readonly value="0"></th><th>';
-$s_html .= 				'Instantané</th>';
-$s_html .= 			'</tr><tr><td class="c" style="text-align:center" colspan="3">';
-$s_html .= 				'Total</td><th>';
-$s_html .= 				'<input type="hidden" id="technologies_metal" value="0" /><input type="text" id="technologies_metal_resultat" size="15" readonly value="0" /></th><th>';
-$s_html .= 				'<input type="hidden" id="technologies_cristal" value="0" /><input type="text" id="technologies_cristal_resultat" size="15" readonly value="0" /></th><th>';
-$s_html .= 				'<input type="hidden" id="technologies_deuterium" value="0" /><input type="text" id="technologies_deuterium_resultat" size="15" readonly value="0" /></th><th>';
-$s_html .= 				'<input type="text" id="technologies_temps" size="15" readonly value="-">';
-$s_html .= 				'<input type="hidden" id="technologies_sec" value="0"></th>';
-$s_html .= 			'</tr><tr><td colspan="7" class="c">';
-$s_html .= 				'Un total de <span id="technologies_ressources" style="color:#FF0080;font-weight:bold;">';
-$s_html .= 				'0</span> ressources, soit <span id="technologies_pt" style="color:#0080FF;font-weight:bold;">';
-$s_html .= 				'0</span> PT ou <span id="technologies_gt" style="color:#80FF00;font-weight:bold;">';
-$s_html .= 				'0</span> GT';
-$s_html .= 			'</td></tr>';
-$s_html .= 		'</table>';
-$s_html .= 		'</div>';
-$s_html .= '</fieldset>';
-
-// Vaisseaux
-
-$s_html_vaisseaux = '';
-
-// 0 = parametre ; 1 = code ; 2 = nom
-$ta_vaisseaux[0] = Array ('2000,2000,0', 'pt', 'Petit transporteur');
-$ta_vaisseaux[1] = Array ('6000,6000,0', 'gt', 'Grand transporteur');
-$ta_vaisseaux[2] = Array ('3000,1000,0', 'cle', 'Chasseur léger');
-$ta_vaisseaux[3] = Array ('6000,4000,0', 'clo', 'Chasseur lourd');
-$ta_vaisseaux[4] = Array ('20000,7000,2000', 'cr', 'Croiseur');
-$ta_vaisseaux[5] = Array ('45000,15000,0', 'vb', 'Vaisseau de bataille');
-$ta_vaisseaux[6] = Array ('30000,40000,15000', 'traq', 'Traqueur');
-$ta_vaisseaux[7] = Array ('50000,25000,15000', 'bb', 'Bombardier');
-$ta_vaisseaux[8] = Array ('60000,50000,15000', 'dest', 'Destructeur');
-$ta_vaisseaux[9] = Array ('5000000,4000000,1000000', 'edlm', 'Étoile de la mort');
-$ta_vaisseaux[10] = Array ('10000,6000,2000', 'recycleur', 'Recycleur');
-$ta_vaisseaux[11] = Array ('10000,20000,10000', 'vc', 'Vaisseau de colonisation');
-$ta_vaisseaux[12] = Array ('0,1000,0', 'sonde', 'Sonde d`espionnage	');
-$ta_vaisseaux[13] = Array ('0,2000,500', 'satellite', 'Satellite solaire');
-
-for($i = 0 ; $i < count($ta_vaisseaux) ; $i++)
-{
-	$s_html_vaisseaux .= '<tr>';
-	$s_html_vaisseaux .= 	'<th>'.$ta_vaisseaux[$i][2].'</th>';
-	$s_html_vaisseaux .= 	'<th><input type="text" id="'.$ta_vaisseaux[$i][1].'_voulu" onkeyup="javascript:vaisseaux(\''.$ta_vaisseaux[$i][1].'\', '.$ta_vaisseaux[$i][0].')" value="0" /></th>';
-	$s_html_vaisseaux .= 	'<th><input type="hidden" id="'.$ta_vaisseaux[$i][1].'_metal" value="0" /><input type="text" id="'.$ta_vaisseaux[$i][1].'_metal_resultat" size="15" readonly value="0" /></th>';
-	$s_html_vaisseaux .= 	'<th><input type="hidden" id="'.$ta_vaisseaux[$i][1].'_cristal" value="0" /><input type="text" id="'.$ta_vaisseaux[$i][1].'_cristal_resultat" size="15" readonly value="0" /></th>';
-	$s_html_vaisseaux .= 	'<th><input type="hidden" id="'.$ta_vaisseaux[$i][1].'_deuterium" value="0" /><input type="text" id="'.$ta_vaisseaux[$i][1].'_deuterium_resultat" size="15" readonly value="0" /></th>';
-	$s_html_vaisseaux .= 	'<th><input type="text" id="'.$ta_vaisseaux[$i][1].'_temps" size="15" readonly value="-" />';
-	$s_html_vaisseaux .= 	'<input type="hidden" id="'.$ta_vaisseaux[$i][1].'_sec" value="0" /></th>';
-	$s_html_vaisseaux .= '</tr>';
-}
-
-$s_html .= '<fieldset>';
-$s_html .= 		'<legend><img src="mod/'.$mod_root.'/moins.png" style="cursor:pointer;" alt="moins" onclick="javascript:f_inverse(\'deroulant_vaisseaux\', this)" /> Vaisseaux</legend>';
-$s_html .= 		'<div id="deroulant_vaisseaux" style="display:block;">';
-$s_html .= 		'<table>';
-$s_html .= 			'<tr><td class="c" style="text-align:center">';
-$s_html .= 				'Nom</td><td class="c" style="text-align:center">';
-$s_html .= 				'Quantité voulue</td><td class="c" style="text-align:center">';
-$s_html .= 				'Métal requis</td><td class="c" style="text-align:center">';
-$s_html .= 				'Cristal requis</td><td class="c" style="text-align:center">';
-$s_html .= 				'Deutérium requis</td><td class="c" style="text-align:center">';
-$s_html .= 				'Durée de construction</td>';
-$s_html .= 			'</tr>';
-$s_html .=			$s_html_vaisseaux;
-$s_html .= 			'<tr><td class="c" style="text-align:center" colspan="2">';
-$s_html .= 				'Total</td><th>';
-$s_html .= 				'<input type="hidden" id="vaisseaux_metal" value="0" /><input type="text" id="vaisseaux_metal_resultat" size="15" readonly value="0" /></th><th>';
-$s_html .= 				'<input type="hidden" id="vaisseaux_cristal" value="0" /><input type="text" id="vaisseaux_cristal_resultat" size="15" readonly value="0" /></th><th>';
-$s_html .= 				'<input type="hidden" id="vaisseaux_deuterium" value="0" /><input type="text" id="vaisseaux_deuterium_resultat" size="15" readonly value="0" /></th><th>';
-$s_html .= 				'<input type="text" id="vaisseaux_temps" size="15" readonly value="-">';
-$s_html .= 				'<input type="hidden" id="vaisseaux_sec" value="0"></th>';
-$s_html .= 			'</tr><tr><td colspan="6" class="c">';
-$s_html .= 				'Un total de <span id="vaisseaux_ressources" style="color:#FF0080;font-weight:bold;">';
-$s_html .= 				'0</span> ressources, soit <span id="vaisseaux_pt" style="color:#0080FF;font-weight:bold;">';
-$s_html .= 				'0</span> PT ou <span id="vaisseaux_gt" style="color:#80FF00;font-weight:bold;">';
-$s_html .= 				'0</span> GT';
-$s_html .= 			'</td></tr>';
-$s_html .= 		'</table>';
-$s_html .= 		'</div>';
-$s_html .= '</fieldset>';
-
-// Défense
-
-$s_html_defense = '';
-
-// 0 = parametre ; 1 = code ; 2 = nom
-$ta_defense[0] = Array ('2000,0,0', 'lm', 'Lanceur de missiles');
-$ta_defense[1] = Array ('1500,500,0', 'ale', 'Artillerie laser légère');
-$ta_defense[2] = Array ('6000,2000,0', 'alo', 'Artillerie laser lourde');
-$ta_defense[3] = Array ('2000,6000,0', 'canon_ion', 'Artillerie à ions');
-$ta_defense[4] = Array ('20000,15000,2000', 'gauss', 'Canon de Gauss');
-$ta_defense[5] = Array ('50000,50000,30000', 'lp', 'Lanceur de plasma');
-$ta_defense[6] = Array ('10000,10000,0', 'pb', 'Petit bouclier');
-$ta_defense[7] = Array ('50000,50000,30000', 'gb', 'Grand bouclier');
-$ta_defense[8] = Array ('8000,0,2000', 'min', 'Missile d`interception');
-$ta_defense[9] = Array ('12500,2500,10000', 'mip', 'Missile interplanétaire');
-
-for($i = 0 ; $i < count($ta_defense) ; $i++)
-{
-	$s_html_defense .= '<tr>';
-	$s_html_defense .= 	'<th>'.$ta_defense[$i][2].'</th>';
-	$s_html_defense .= 	'<th><input type="text" id="'.$ta_defense[$i][1].'_voulu" onkeyup="javascript:defense(\''.$ta_defense[$i][1].'\', '.$ta_defense[$i][0].')" value="0" /></th>';
-	$s_html_defense .= 	'<th><input type="hidden" id="'.$ta_defense[$i][1].'_metal" value="0" /><input type="text" id="'.$ta_defense[$i][1].'_metal_resultat" size="15" readonly value="0" /></th>';
-	$s_html_defense .= 	'<th><input type="hidden" id="'.$ta_defense[$i][1].'_cristal" value="0" /><input type="text" id="'.$ta_defense[$i][1].'_cristal_resultat" size="15" readonly value="0" /></th>';
-	$s_html_defense .= 	'<th><input type="hidden" id="'.$ta_defense[$i][1].'_deuterium" value="0" /><input type="text" id="'.$ta_defense[$i][1].'_deuterium_resultat" size="15" readonly value="0" /></th>';
-	$s_html_defense .= 	'<th><input type="text" id="'.$ta_defense[$i][1].'_temps" size="15" readonly value="-" />';
-	$s_html_defense .= 	'<input type="hidden" id="'.$ta_defense[$i][1].'_sec" value="0" /></th>';
-	$s_html_defense .= '</tr>';
-}
-
-$s_html .= '<fieldset>';
-$s_html .= 		'<legend><img src="mod/'.$mod_root.'/moins.png" style="cursor:pointer;" alt="moins" onclick="javascript:f_inverse(\'deroulant_defense\', this)" /> Défense</legend>';
-$s_html .= 		'<div id="deroulant_defense" style="display:block;">';
-$s_html .= 		'<table>';
-$s_html .= 			'<tr><td class="c" style="text-align:center">';
-$s_html .= 				'Nom</td><td class="c" style="text-align:center">';
-$s_html .= 				'Quantité voulue</td><td class="c" style="text-align:center">';
-$s_html .= 				'Métal requis</td><td class="c" style="text-align:center">';
-$s_html .= 				'Cristal requis</td><td class="c" style="text-align:center">';
-$s_html .= 				'Deutérium requis</td><td class="c" style="text-align:center">';
-$s_html .= 				'Durée de construction</td>';
-$s_html .= 			'</tr>';
-$s_html .=			$s_html_defense;
-$s_html .= 			'<tr><td class="c" style="text-align:center" colspan="2">';
-$s_html .= 				'TOTAL</td><th>';
-$s_html .= 				'<input type="hidden" id="defenses_metal" value="0" /><input type="text" id="defenses_metal_resultat" size="15" readonly value="0" /></th><th>';
-$s_html .= 				'<input type="hidden" id="defenses_cristal" value="0" /><input type="text" id="defenses_cristal_resultat" size="15" readonly value="0" /></th><th>';
-$s_html .= 				'<input type="hidden" id="defenses_deuterium" value="0" /><input type="text" id="defenses_deuterium_resultat" size="15" readonly value="0" /></th><th>';
-$s_html .= 				'<input type="text" id="defenses_temps" size="15" readonly value="-">';
-$s_html .= 				'<input type="hidden" id="defenses_sec" value="0"></th>';
-$s_html .= 			'</tr><tr><td colspan="6" class="c">';
-$s_html .= 				'Un total de <span id="defenses_ressources" style="color:#FF0080;font-weight:bold;">';
-$s_html .= 				'0</span> ressources, soit <span id="defenses_pt" style="color:#0080FF;font-weight:bold;">';
-$s_html .= 				'0</span> PT ou <span id="defenses_gt" style="color:#80FF00;font-weight:bold;">';
-$s_html .= 				'0</span> GT';
-$s_html .= 			'</td></tr>';
-$s_html .= 		'</table>';
-$s_html .= 		'</div>';
-$s_html .= '</fieldset>';
-
-
-
-// $s_html .= '<fieldset>';
-// $s_html .= 		'<legend><img src="mod/'.$mod_root.'/moins.png" style="cursor:pointer;" alt="moins" onclick="javascript:f_inverse(\'deroulant_gestion\', this)" /> Gestion</legend>';
-// $s_html .= 		'<div id="deroulant_gestion" style="display:block;">';
-// $s_html .= 		'<div>';
-// $s_html .= 			'<input type="submit" value="Sauvegarder les données" onclick="javascript:sauvegarde();" />';
-// $s_html .= 			'<input type="submit" value="Restaurer les données" onclick="javascript:restaure();" />';
-// $s_html .= 			'<input type="submit" value="Changelog" onclick="javascript:inverse(\'changelog\');" />';
-// $s_html .= 			'<input type="submit" value="Reset" onclick="javascript:f_reset_donnees();" />';
-// $s_html .= 		'</div>';
-// $s_html .= 		'<div id="changelog" style="display:none;">';
-// $s_html .= 			'<h2>Changelog</h2>';
-// $s_html .= 			'<p>02/09/2012</p>';
-// $s_html .= 			'<ol style="list-style-type: none;">';
-// $s_html .= 				'<li>v1.1.0';
-// $s_html .= 				'<ul type="disc">';
-// $s_html .= 					'<li>Compatibilité OGSpy 3.1.0</li>';
-// $s_html .= 					'<li>Optimisation du code</li>';
-// $s_html .= 					'<li>Simplification du fonctionnement</li>';
-// $s_html .= 					'<li>Séparation des milliers avec un espace</li>';
-// $s_html .= 				'</ul>';
-// $s_html .= 			'</ol>';
-// $s_html .= 			'<p>18/04/2008</p>';
-// $s_html .= 			'<ol style="list-style-type: none;">';
-// $s_html .= 				'<li>v0.5';
-// $s_html .= 				'<ul type="disc">';
-// $s_html .= 					'<li>Ajout du calcul des transports</li>';
-// $s_html .= 					'<li>Ajout du script de désintallation</li>';
-// $s_html .= 					'<li>Controle de sécurité pour éviter l\'erreur de "Duplicate Entry"</li>';
-// $s_html .= 				'</ul>';
-// $s_html .= 			'</ol>';
-// $s_html .= 			'<p>18/04/2008</p>';
-// $s_html .= 			'<ol style="list-style-type: none;">';
-// $s_html .= 				'<li>v0.4d';
-// $s_html .= 				'<ul type="disc">';
-// $s_html .= 					'<li>Fix d\'un bug à l\'installation</li>';
-// $s_html .= 				'</ul>';
-// $s_html .= 			'</ol>';
-// $s_html .= 			'<p>16/04/2008</p>';
-// $s_html .= 			'<ol style="list-style-type: none;">';
-// $s_html .= 				'<li>v0.4c';
-// $s_html .= 				'<ul type="disc">';
-// $s_html .= 					'<li>Ajout de la technologie expéditions</li>';
-// $s_html .= 					'<li>Modification du fichier install</li>';
-// $s_html .= 					'<li>Correction du chemin pour atteindre formule.js</li>';
-// $s_html .= 				'</ul>';
-// $s_html .= 			'</ol>';
-// $s_html .= 			'<p>04/03/2007</p>';
-// $s_html .= 			'<ol style="list-style-type: none;">';
-// $s_html .= 				'<li>v0.4';
-// $s_html .= 				'<ul type="disc">';
-// $s_html .= 					'<li>Ajout du traqueur</li>';
-// $s_html .= 					'<li>Correction du bug d\'affichage qui ne permmetait pas de voir les ressources</li>';
-// $s_html .= 					'<li>Modification du prix du traqueur</li>';
-// $s_html .= 					'<li>Installation des Install/Update qui récupére le n° de version dans le fichier version.txt</li>';
-// $s_html .= 				'</ul>';
-// $s_html .= 			'</ol>';
-// $s_html .= 			'<p>09/08/2006</p>';
-// $s_html .= 			'<ol style="list-style-type: none;">';
-// $s_html .= 				'<li>v0.3';
-// $s_html .= 					'<ul type="disc">';
-// $s_html .= 					'<li>Correction du problème des prix du terraformeur (merci ben_12)</li>';
-// $s_html .= 					'<li>Correction du non-rafraichissement des temps si modifications du niveau de l\'usine de robots et de nanites ou du chantier spatial</li>';
-// $s_html .= 				'</ul>';
-// $s_html .= 			'</ol>';
-// $s_html .= 			'<p>09/07/2006</p>';
-// $s_html .= 			'<ol style="list-style-type: none;">';
-// $s_html .= 				'<li>v0.2';
-// $s_html .= 				'<ul type="disc">';
-// $s_html .= 					'<li>Correction d\'un bug empêchant le calcul des technologies</li>';
-// $s_html .= 					'<li>Correction d\'un problème de calcul de l\'énergie nécessaire au graviton (merci Corwin)</li>';
-// $s_html .= 					'<li>Ajout de la fonction reset</li>';
-// $s_html .= 				'</ul>';
-// $s_html .= 			'</ol>';
-// $s_html .= 			'<p>08/07/2006</p>';
-// $s_html .= 			'<ol style="list-style-type: none;">';
-// $s_html .= 				'<li>v0.1';
-// $s_html .= 				'<ul type="disc">';
-// $s_html .= 					'<li>Sortie d\'OGSCalc en mod OGSpy</li>';
-// $s_html .= 				'</ul>';
-// $s_html .= 			'</ol>';
-// $s_html .= 		'</div>';
-// $s_html .= 		'</div>';
-// $s_html .= '</fieldset>';
-
-$s_html .= '<div style="font-size:10px;width:400px;text-align:center;background-image:url(\'skin/OGSpy_skin/tableaux/th.png\');background-repeat:repeat;">OGSCalc ('.$mod_version.')';
-$s_html .= 		'<br>Développé par <a href="http://forum.ogsteam.fr/index.php?action=emailuser;sa=email;uid=1">Aéris</a>';
-$s_html .= 		'<br>Mise à jour par <a href="mailto:contact@epe-production.org?subject=ogscalc">xaviernuma</a> 2016';
-$s_html .= '</div>';
-
-echo $s_html;
-
-require_once("views/page_tail.php");
-
+    for ($i = 101; $i <= 101 + $nb_planete - 1; $i++) {
+        $prodMetal += $user_production['reel'][$i]['M'];
+        $prodCrystal += $user_production['reel'][$i]['C'];
+        $prodDeut += $user_production['reel'][$i]['D'];
+    }
 ?>
+	<!-- VIEW  -->
+	<style>
+		<?php include( "mod/".$mod_root."/css/".$mod_root.".css" ); ?>
+	</style>
+    <table width="100%">
+        <tr>
+            <?php
+
+            $colspan = (($nb_planete + 1)*2) / 2;
+            $colspan_planete = floor($colspan);
+            $colspan_lune = ceil($colspan);
+
+            if ($view == "planets") {
+                echo "<th colspan='$colspan_planete'><a>".$lang['HOME_EMPIRE_PLANET']."</a></th>";
+                echo "<td class='c' align='center' colspan='$colspan_lune' onClick=\"window.location = 'index.php?action=ogscalc&amp;view=moons';\"><a style='cursor:pointer'><font color='lime'>".$lang['HOME_EMPIRE_MOON']."</font></a></td>";
+            } else {
+                echo "<td class='c' align='center' colspan='$colspan_planete' onClick=\"window.location = 'index.php?action=ogscalc&amp;view=planets';\"><a style='cursor:pointer'><font color='lime'>".$lang['HOME_EMPIRE_PLANET']."</font></a></td>";
+                echo "<th colspan='$colspan_lune'><a>".$lang['HOME_EMPIRE_MOON']."</a></th>";
+            }
+            ?>
+        </tr>
+
+        <?php
+
+        // verification de compte de planete/lune avec la technologie astro
+        $astro = astro_max_planete($user_technology['Astrophysique']);
+
+        if (((find_nb_planete_user($user_data['user_id']) > $astro) || (find_nb_moon_user($user_data['user_id']) > $astro)) && ($user_technology != false)) {
+            echo '<tr>';
+            echo '<td class="c" colspan="' . ($nb_planete < 10 ? '10' : $nb_planete + 1) . '">';
+            echo $lang['HOME_EMPIRE_ERROR'].' ';
+            echo (find_nb_planete_user($user_data['user_id']) > $astro) ? $lang['HOME_EMPIRE_ERROR_PLANET'].'<br>' : '';
+            echo (find_nb_moon_user($user_data['user_id']) > $astro) ? $lang['HOME_EMPIRE_ERROR_MOON'].'<br>' : '';
+            echo '</td>';
+            echo '</tr>';
+        }
+
+        ?>
+
+
+        <tr>
+            <td class="c" colspan="<?php print ($nb_planete < 10) ? '10' : ($nb_planete + 1) * 2 ?>"><?php echo($lang['OGSCALC_RESOURCES']); ?></td>
+        </tr>          
+        <tr>
+            <th></th><th colspan="2"><a><?php echo($lang['HOME_EMPIRE_METAL']); ?></a></th><th colspan="2"><a><?php echo($lang['HOME_EMPIRE_CRYSTAL']); ?></a></th><th colspan="2"><a><?php echo($lang['HOME_EMPIRE_DEUT']); ?></a></th><th colspan="2"><a><?php echo($lang['OGSCALC_RESOURCES_RATE']); ?></a></th><th colspan="2"><input type="text" class="inputOgscalc rate" id="metal_rate" maxlength="2" value="3" > / <input type="text" class="inputOgscalc rate" id="crystal_rate" maxlength="2" value="2" > / 1</th>
+        </tr>           
+        <tr>
+            <th ><a><?php echo($lang['HOME_SIMU_PRODUCTION']); ?></a></th><th id="metal_prod" colspan="2"><?php echo(number_format($prodMetal, 0, ",", ".")); ?></th><th id="crystal_prod" colspan="2"><?php echo(number_format($prodCrystal, 0, ",", ".")); ?></th><th id="deut_prod" colspan="2"><?php echo(number_format($prodDeut, 0, ",", ".")); ?></th><th id="convert_prod" colspan="2"></th>
+        </tr>           
+        <tr>
+            <th ><a><?php echo($lang['OGSCALC_RESOURCES_ACCOUNT']); ?></a></th><th colspan="2"><input type="text" class="inputOgscalc" id="metal_resource" maxlength="12" value="0" ></th><th colspan="2"><input type="text" class="inputOgscalc" id="crystal_resource" maxlength="12" value="0" ></th><th colspan="2"><input type="text" class="inputOgscalc" id="deut_resource" maxlength="12" value="0" ></th><th id="convert_resource" colspan="2"></th>
+        </tr> 
+        <tr>
+            <td class="c" colspan="<?php print ($nb_planete < 10) ? '10' : ($nb_planete + 1) * 2 ?>"><?php echo($lang['HOME_EMPIRE_SUMMARY']); ?></td>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_NAME']); ?></a></th>
+            <?php
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+                $name = $user_building[$i]["planet_name"];
+                if ($name == "") $name = "&nbsp;";
+
+                echo "\t" . "<th colspan='2'><a>" . $name . "</a></th>" . "\n";
+            }
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_COORD']); ?></a></th>
+            <?php
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+                $coordinates = $user_building[$i]["coordinates"];
+                if ($coordinates == "" || ($user_building[$i]["planet_name"] == "" && $view == "moons")) $coordinates = "&nbsp;";
+                else $coordinates = "[" . $coordinates . "]";
+
+                echo "\t" . "<th colspan='2'>" . $coordinates . "</th>" . "\n";
+            }
+            if($view == "planets") {
+            ?>
+        </tr>
+        <tr>
+            <td class="c_batiments" colspan="<?php print ($nb_planete < 10) ? '10' : ($nb_planete + 1) * 2 ?>">
+                <?php echo($lang['HOME_EMPIRE_BUILDINGS']); ?>
+            </td>
+        </tr>
+        <tr>
+        	<th></th>
+        	 <?php        	 
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+            	 echo "\t" . "<th>".$lang['OGSCALC_CURRENT']."</th><th>".$lang['OGSCALC_PROJECT']."</th>" . "\n";
+            }
+            ?>            
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_MINE_METAL']); ?></a></th>
+            <?php
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+                $M = $user_building[$i]["M"];
+                if ($M == "") $M = "&nbsp;";
+
+                echo "\t" . "<th><input class='inputOgscalc building current M' type='text' maxLength='2'  value='" . $M . "' id='m" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project M' type='text' maxLength='2'  value='" . $M . "' id='m" . ($i + 1 - $start) . "'></th>" ."\n";
+            }
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_MINE_CRYSTAL']); ?></a></th>
+            <?php
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+                $C = $user_building[$i]["C"];
+                if ($C == "") $C = "&nbsp;";
+
+                echo "\t" . "<th><input class='inputOgscalc building current C' type='text' maxLength='2'  value='" . $C . "'' id='c" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project C' type='text' maxLength='2'  value='" . $C . "'' id='c" . ($i + 1 - $start) . "'></th>" ."\n";
+            }
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_MINE_DEUT']); ?></a></th>
+            <?php
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+                $D = $user_building[$i]["D"];
+                if ($D == "") $D = "&nbsp;";
+
+                echo "\t" . "<th><input class='inputOgscalc building current D' type='text' maxLength='2'  value='" . $D . "'' id='d" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project D' type='text' maxLength='2'  value='" . $D . "'' id='d" . ($i + 1 - $start) . "'></th>" ."\n";
+            }
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_SOLAR_PLANT']); ?></a></th>
+            <?php
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+                $CES = $user_building[$i]["CES"];
+                if ($CES == "") $CES = "&nbsp;";
+
+                echo "\t" . "<th><input class='inputOgscalc building current CES' type='text' maxLength='2'  value='" . $CES . "' id='ces" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project CES' type='text' maxLength='2'  value='" . $CES . "' id='ces" . ($i + 1 - $start) . "'></th>" ."\n";
+            }
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_FUSION_PLANT']); ?></a></th>
+            <?php
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+                $CEF = $user_building[$i]["CEF"];
+                if ($CEF == "") $CEF = "&nbsp;";
+
+                echo "\t" . "<th><input class='inputOgscalc building current CEF' type='text' maxLength='2'  value='" . $CEF . "' id='cef" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project CEF' type='text' maxLength='2'  value='" . $CEF . "' id='cef" . ($i + 1 - $start) . "'></th>" ."\n";
+            }
+
+            } // fin de si view="planets"
+            else {
+                echo '</tr><tr> <td class="c" colspan="';
+                print ($nb_planete < 10) ? '10' : ($nb_planete + 1) * 2;
+                echo '">'.$lang['HOME_EMPIRE_BUILDINGS'].'</td>';
+            }
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_ROBOTS_PLANT']); ?></a></th>
+            <?php
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+                $UdR = $user_building[$i]["UdR"];
+                if ($UdR == "") $UdR = "&nbsp;";
+
+                echo "\t" . "<th><input class='inputOgscalc building current UDR' type='text' maxLength='2'  value='" . $UdR . "' id='udr" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project UDR' type='text' maxLength='2'  value='" . $UdR . "'id='udr" . ($i + 1 - $start) . "'></th>" ."\n";
+            }
+
+            if($view == "planets") {
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_NANITES_PLANT']); ?></a></th>
+            <?php
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+                $UdN = $user_building[$i]["UdN"];
+                if ($UdN == "") $UdN = "&nbsp;";
+
+                echo "\t" . "<th><input class='inputOgscalc building current UDN' type='text' maxLength='2'  value='" . $UdN . "' id='udn" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project UDN' type='text' maxLength='2'  value='" . $UdN . "' id='udn" . ($i + 1 - $start) . "'></th>" ."\n";
+            }
+
+            } // fin de si view="planets"
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_SHIPYARD']); ?></a></th>
+            <?php
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+                $CSp = $user_building[$i]["CSp"];
+                if ($CSp == "") $CSp = "&nbsp;";
+
+                echo "\t" . "<th><input class='inputOgscalc building current CSP' type='text' maxLength='2'  value='" . $CSp . "' id='csp" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project CSP' type='text' maxLength='2'  value='" . $CSp . "' id='csp" . ($i + 1 - $start) . "'></th>" ."\n";
+            }
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_METALSTORAGE']); ?></a></th>
+            <?php
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+                $HM = $user_building[$i]["HM"];
+                if ($HM == "") $HM = "&nbsp;";
+
+                echo "\t" . "<th><input class='inputOgscalc building current HM' type='text' maxLength='2'  value='" . $HM . "' id='hm" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project HM' type='text' maxLength='2'  value='" . $HM . "' id='hm" . ($i + 1 - $start) . "'></th>" ."\n";
+            }
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_CRYSTALSTORAGE']); ?></a></th>
+            <?php
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+                $HC = $user_building[$i]["HC"];
+                if ($HC == "") $HC = "&nbsp;";
+
+                echo "\t" . "<th><input class='inputOgscalc building current HC' type='text' maxLength='2'  value='" . $HC . "' id='hc" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project HC' type='text' maxLength='2'  value='" . $HC . "' id='hc" . ($i + 1 - $start) . "'></th>" ."\n";
+            }
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_DEUTSTORAGE']); ?></a></th>
+            <?php
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+                $HD = $user_building[$i]["HD"];
+                if ($HD == "") $HD = "&nbsp;";
+
+                echo "\t" . "<th><input class='inputOgscalc building current HD' type='text' maxLength='2'  value='" . $HD . "' id='hd" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project HD' type='text' maxLength='2'  value='" . $HD . "' id='hd" . ($i + 1 - $start) . "'></th>" ."\n";
+            }
+            ?>
+        </tr>
+<?php
+	if($view == "planets") { 
+?>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_RESEARCHLAB']); ?></a></th>
+            <?php
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+                $Lab = $user_building[$i]["Lab"];
+                $Labs[] = intval($Lab);
+                if ($Lab == "") $Lab = "&nbsp;";
+
+                echo "\t" . "<th><input class='inputOgscalc building current LAB' type='text' maxLength='2'  value='" . $Lab . "' id='lab" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project LAB' type='text' maxLength='2'  value='" . $Lab . "' id='lab" . ($i + 1 - $start) . "'></th>" ."\n";
+            }
+            $maxLab = max($Labs);            
+            if ( $server_config['ddr'] == 1 )
+            {
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_ALLIANCEDEPOT']); ?></a></th>
+            <?php
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+                $DdR = $user_building[$i]["DdR"];
+                if ($DdR == "") $DdR = "&nbsp;";
+
+                echo "\t" . "<th><input class='inputOgscalc building current DDR' type='text' maxLength='2'  value='" . $DdR . "' id='ddr" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project DDR' type='text' maxLength='2'  value='" . $DdR . "' id='ddr" . ($i + 1 - $start) . "'></th>" ."\n";
+            }
+            }//Fin de si $server_config['ddr']
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_TERRAFORMER']); ?></a></th>
+            <?php
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+                $Ter = $user_building[$i]["Ter"];
+                if ($Ter == "") $Ter = "&nbsp;";
+
+                echo "\t" . "<th><input class='inputOgscalc building current TER' type='text' maxLength='2'  value='" . $Ter . "' id='ter" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project TER' type='text' maxLength='2'  value='" . $Ter . "' id='ter" . ($i + 1 - $start) . "'></th>" ."\n";
+            }
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_MISSILESSILO']); ?></a></th>
+            <?php
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+                $Silo = $user_building[$i]["Silo"];
+                if ($Silo == "") $Silo = "&nbsp;";
+
+                echo "\t" . "<th><input class='inputOgscalc building current SILO' type='text' maxLength='2'  value='" . $Silo . "' id='silo" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project SILO' type='text' maxLength='2'  value='" . $Silo . "' id='silo" . ($i + 1 - $start) . "'></th>" ."\n";
+            }
+
+            } // fin de si view="planets"
+            else {
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_LUNARSTATION']); ?></a></th>
+            <?php
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+                $BaLu = $user_building[$i]["BaLu"];
+                if ($BaLu == "") $BaLu = "&nbsp;";
+
+                echo "\t" . "<th><input class='inputOgscalc building current BALU' type='text' maxLength='2'  value='" . $BaLu . "' id='balu" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project BALU' type='text' maxLength='2'  value='" . $BaLu . "' id='balu" . ($i + 1 - $start) . "'></th>" ."\n";
+            }
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_LUNARPHALANX']); ?></a></th>
+            <?php
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+                $Pha = $user_building[$i]["Pha"];
+                if ($Pha == "") $Pha = "&nbsp;";
+
+                echo "\t" . "<th><input class='inputOgscalc building current PHA' type='text' maxLength='2'  value='" . $Pha . "' id='pha" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project PHA' type='text' maxLength='2'  value='" . $Pha . "' id='pha" . ($i + 1 - $start) . "'></th>" ."\n";
+            }
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_LUNARJUMPGATE']); ?></a></th>
+            <?php
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+                $PoSa = $user_building[$i]["PoSa"];
+                if ($PoSa == "") $PoSa = "&nbsp;";
+
+                echo "\t" . "<th><input class='inputOgscalc building current POSA' type='text' maxLength='2'  value='" . $PoSa . "' id='posa" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project POSA' type='text' maxLength='2'  value='" . $PoSa . "' id='posa" . ($i + 1 - $start) . "'></th>" ."\n";
+            }
+
+            } // fin de sinon view="planets"
+            ?>
+        </tr>
+        <tr>
+            <td class="c_batiments sum" colspan="<?php print ($nb_planete < 10) ? '10' : ($nb_planete + 1) * 2 ?>">
+                <?php echo($lang['OGSCALC_BUILDINGS_SUM']); ?>
+            </td>
+        </tr>       
+        <tr>
+        	<th></th><th colspan="2"><a><?php echo($lang['HOME_EMPIRE_METAL']); ?></a></th><th colspan="2"><a><?php echo($lang['HOME_EMPIRE_CRYSTAL']); ?></a></th><th colspan="2"><a><?php echo($lang['HOME_EMPIRE_DEUT']); ?></a></th><?php if( $view == "planets" ) { ?><th colspan="2"><a><?php echo($lang['HOME_EMPIRE_ENERGY']); ?></a></th><?php  } ?><th colspan="2"><a><?php echo($lang['GAME_FLEET_PT']); ?></a></th><th colspan="2"><a><?php echo($lang['GAME_FLEET_GT']); ?></a></th><th colspan="2"><a><?php echo($lang['OGSCALC_POINTS']); ?></a></th><th colspan="2"><a><?php echo($lang['OGSCALC_TIME']); ?></a></th>
+        </tr>
+        <tr>
+        	<th><a><?php echo($lang['OGSCALC_SUM']); ?></a></th><th colspan="2" id="sum_metal_buildings"></th><th colspan="2" id="sum_crystal_buildings"></th><th colspan="2" id="sum_deut_buildings"></th><?php if( $view == "planets" ) { ?><th colspan="2" id="sum_energy_buildings"></th><?php  } ?><th colspan="2" id="sum_pt_buildings"></th><th colspan="2" id="sum_gt_buildings"></th><th colspan="2" id="sum_points_buildings"></th><th colspan="2" id="sum_time_buildings"></th>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['OGSCALC_TIME_PRODUCTION']); ?></a></th><th colspan="2" id="time_metal_buildings"></th><th colspan="2" id="time_crystal_buildings"></th><th colspan="2" id="time_deut_buildings"></th><th colspan="2"><a><?php echo($lang['OGSCALC_TIME_PRODUCTION_CONVERT']); ?></a></th><th colspan="2" id="time_convert_buildings"></th>
+        </tr>
+        <tr>
+            <td class="c_satellite" colspan="<?php print ($nb_planete < 10) ? '10' : ($nb_planete + 1) * 2; ?>"><?php echo($lang['HOME_EMPIRE_OTHERS']); ?></td>
+        </tr>
+        <tr>
+        	<th></th>
+        	 <?php        	 
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+            	 echo "\t" . "<th>".$lang['OGSCALC_CURRENT']."</th><th>".$lang['OGSCALC_PROJECT']."</th>" . "\n";
+            }
+            ?>            
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_SATELLITES']); ?></a></th>
+            <?php
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+                $Sat = $user_building[$i]["Sat"];
+                if ($Sat == "") $Sat = "&nbsp;";
+                else $Sat = number_format($Sat, 0, ',', '');
+
+                echo "\t" . "<th><input type='text' maxLength='12' class='inputOgscalc divers current Sat' id='6" . ($i + 1 - $start) . "' value='" . $Sat . "'></th>" .
+                "<th><input type='text' maxLength='12' class='inputOgscalc divers project Sat' value='" . $Sat . "' id='6" . ($i + 1 - $start) . "' ></th>" ."\n";
+            }            
+            ?>
+        </tr>
+        <tr>
+            <td class="c_satellite sum" colspan="<?php print ($nb_planete < 10) ? '10' : ($nb_planete + 1) * 2; ?>"><?php echo($lang['OGSCALC_DIVERS_SUM']); ?></td>
+        </tr>       
+        <tr>
+        	<th></th><th colspan="2"><a><?php echo($lang['HOME_EMPIRE_METAL']); ?></a></th><th colspan="2"><a><?php echo($lang['HOME_EMPIRE_CRYSTAL']); ?></a></th><th colspan="2"><a><?php echo($lang['HOME_EMPIRE_DEUT']); ?></a></th><th colspan="2"><a><?php echo($lang['GAME_FLEET_PT']); ?></a></th><th colspan="2"><a><?php echo($lang['GAME_FLEET_GT']); ?></a></th><th colspan="2"><a><?php echo($lang['OGSCALC_POINTS']); ?></a></th><th colspan="2"><a><?php echo($lang['OGSCALC_TIME']); ?></a></th>
+        </tr>
+        <tr>
+        	<th><a><?php echo($lang['OGSCALC_SUM']); ?></a></th><th colspan="2" id="sum_metal_divers">0</th><th colspan="2" id="sum_crystal_divers"></th><th colspan="2" id="sum_deut_divers"></th><th colspan="2" id="sum_pt_divers"></th><th colspan="2" id="sum_gt_divers"></th><th colspan="2" id="sum_points_divers"></th><th colspan="2" id="sum_time_divers"></th>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['OGSCALC_TIME_PRODUCTION']); ?></a></th><th colspan="2" id="time_metal_divers"></th><th colspan="2" id="time_crystal_divers"></th><th colspan="2" id="time_deut_divers"></th><th colspan="2"><a><?php echo($lang['OGSCALC_TIME_PRODUCTION_CONVERT']); ?></a></th><th colspan="2" id="time_convert_divers"></th>
+        </tr>
+        <?php if($view == "planets") { ?>
+        <tr>
+            <td class="c_classement_recherche" colspan="<?php print ($nb_planete < 10) ? '10' : ($nb_planete + 1) * 2 ?>"><?php echo($lang['HOME_EMPIRE_TECHNOS']); ?></td>
+        </tr>
+        <tr>
+        	<th></th>
+        	 <?php        	 
+            	 echo "\t" . "<th>".$lang['OGSCALC_CURRENT']."</th><th>".$lang['OGSCALC_PROJECT']."</th>" . "\n";
+            ?>            
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_TECHNOS_SPY']); ?></a></th>
+            <?php
+
+                $Esp = $user_technology["Esp"] != "" ? $user_technology["Esp"] : "0";
+
+                echo "\t" . "<th><input type='text' maxLength='2'  class='inputOgscalc technos current' id='Esp' value='".$Esp."'></th>" .
+                "<th><input type='text' maxLength='2'  class='inputOgscalc technos project' id='Esp' value='".$Esp."'></th>" ."\n";
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_TECHNOS_COMPUTER']); ?></a></th>
+            <?php
+
+                $Ordi = $user_technology["Ordi"] != "" ? $user_technology["Ordi"] : "0";
+
+                echo "\t" . "<th><input type='text' maxLength='2'  class='inputOgscalc technos current' id='Ordi' value='".$Ordi."'></th>" .
+                "<th><input type='text' maxLength='2'  class='inputOgscalc technos project' id='Ordi' value='".$Ordi."'></th>" ."\n";
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_TECHNOS_WEAPONS']); ?></a></th>
+            <?php
+
+                $Armes = $user_technology["Armes"] != "" ? $user_technology["Armes"] : "0";
+
+                echo "\t" . "<th><input type='text' maxLength='2'  class='inputOgscalc technos current' id='Armes' value='".$Armes."'></th>" .
+                "<th><input type='text' maxLength='2'  class='inputOgscalc technos project' id='Armes' value='".$Armes."'></th>" ."\n";
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_TECHNOS_SHIELD']); ?></a></th>
+            <?php
+
+                $Bouclier = $user_technology["Bouclier"] != "" ? $user_technology["Bouclier"] : "0";
+                
+                echo "\t" . "<th><input type='text' maxLength='2'  class='inputOgscalc technos current' id='Bouclier' value='".$Bouclier."'></th>" .
+                "<th><input type='text' maxLength='2'  class='inputOgscalc technos project' id='Bouclier' value='".$Bouclier."'></th>" ."\n";        
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_TECHNOS_PROTECTION']); ?></a></th>
+            <?php
+
+            	$Protection = $user_technology["Protection"] != "" ? $user_technology["Protection"] : "0";
+
+                echo "\t" . "<th><input type='text' maxLength='2'  class='inputOgscalc technos current' id='Protection' value='".$Protection."'></th>" .
+                "<th><input type='text' maxLength='2'  class='inputOgscalc technos project' id='Protection' value='".$Protection."'></th>" ."\n";
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_TECHNOS_ENERGY']); ?></a></th>
+            <?php
+
+                $NRJ = $user_technology["NRJ"] != "" ? $user_technology["NRJ"] : "0";
+
+                echo "\t" . "<th><input type='text' maxLength='2'  class='inputOgscalc technos current' id='NRJ' value='".$NRJ."'></th>" .
+                "<th><input type='text' maxLength='2'  class='inputOgscalc technos project' id='NRJ' value='".$NRJ."'></th>" ."\n";
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_TECHNOS_HYPERSPACE']); ?></a></th>
+            <?php
+
+            	$Hyp = $user_technology["Hyp"] != "" ? $user_technology["Hyp"] : "0";
+
+                echo "\t" . "<th><input type='text' maxLength='2'  class='inputOgscalc technos current' id='Hyp' value='".$Hyp."'></th>" .
+                "<th><input type='text' maxLength='2'  class='inputOgscalc technos project' id='Hyp' value='".$Hyp."'></th>" ."\n";
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_TECHNOS_COMBUSTION_DRIVE']); ?></a></th>
+            <?php
+
+                $RC = $user_technology["RC"] != "" ? $user_technology["RC"] : "0";
+
+                echo "\t" . "<th><input type='text' maxLength='2'  class='inputOgscalc technos current' id='RC' value='".$RC."'></th>" .
+                "<th><input type='text' maxLength='2'  class='inputOgscalc technos project' id='RC' value='".$RC."'></th>" ."\n";
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_TECHNOS_IMPULSE_DRIVE']); ?></a></th>
+            <?php
+
+                $RI = $user_technology["RI"] != "" ? $user_technology["RI"] : "0";
+
+                echo "\t" . "<th><input type='text' maxLength='2'  class='inputOgscalc technos current' id='RI' value='".$RI."'></th>" .
+                "<th><input type='text' maxLength='2'  class='inputOgscalc technos project' id='RI' value='".$RI."'></th>" ."\n";               
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_TECHNOS_HYPER_DRIVE']); ?></a></th>
+            <?php
+
+                $PH = $user_technology["PH"] != "" ? $user_technology["PH"] : "0";
+
+                echo "\t" . "<th><input type='text' maxLength='2'  class='inputOgscalc technos current' id='PH' value='".$PH."'></th>" .
+                "<th><input type='text' maxLength='2'  class='inputOgscalc technos project' id='PH' value='".$PH."'></th>" ."\n";
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_TECHNOS_LASER']); ?></a></th>
+            <?php
+                
+                $Laser = $user_technology["Laser"] != "" ? $user_technology["Laser"] : "0";
+
+                echo "\t" . "<th><input type='text' maxLength='2'  class='inputOgscalc technos current' id='Laser' value='".$Laser."'></th>" .
+                "<th><input type='text' maxLength='2'  class='inputOgscalc technos project' id='Laser' value='".$Laser."'></th>" ."\n";
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_TECHNOS_IONS']); ?></a></th>
+            <?php
+
+                $Ions = $user_technology["Ions"] != "" ? $user_technology["Ions"] : "0";
+
+                echo "\t" . "<th><input type='text' maxLength='2'  class='inputOgscalc technos current' id='Ions' value='".$Ions."'></th>" .
+                "<th><input type='text' maxLength='2'  class='inputOgscalc technos project' id='Ions' value='".$Ions."'></th>" ."\n";
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_TECHNOS_PLASMA']); ?></a></th>
+            <?php
+
+                $Plasma = $user_technology["Plasma"] != "" ? $user_technology["Plasma"] : "0";
+
+                echo "\t" . "<th><input type='text' maxLength='2'  class='inputOgscalc technos current' id='Plasma' value='".$Plasma."'></th>" .
+                "<th><input type='text' maxLength='2'  class='inputOgscalc technos project' id='Plasma' value='".$Plasma."'></th>" ."\n";
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_TECHNOS_RESEARCH_NETWORK']); ?></a></th>
+            <?php
+
+	            $RRI = $user_technology["RRI"] != "" ? $user_technology["RRI"] : "0";
+
+	            echo "\t" . "<th><input type='text' maxLength='2'  class='inputOgscalc technos current' id='RRI' value='".$RRI."'></th>" .
+                "<th><input type='text' maxLength='2'  class='inputOgscalc technos project' id='RRI' value='".$RRI."'></th>" ."\n";        
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_TECHNOS_ASTRO']); ?></a></th>
+            <?php
+	            
+	            $Astrophysique = $user_technology["Astrophysique"] != "" ? $user_technology["Astrophysique"] : "0";
+
+	            echo "\t" . "<th><input type='text' maxLength='2'  class='inputOgscalc technos current' id='Astrophysique' value='".$Astrophysique."'></th>" .
+                "<th><input type='text' maxLength='2'  class='inputOgscalc technos project' id='Astrophysique' value='".$Astrophysique."'></th>" ."\n";
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_TECHNOS_GRAVITY']); ?></a></th>
+            <?php
+	           
+	           $Graviton = $user_technology["Graviton"] != "" ? $user_technology["Graviton"] : "0";	                  
+
+	            echo "\t" . "<th><input type='text' maxLength='2'  class='inputOgscalc technos current' id='Graviton' value='".$Graviton."'></th>" .
+                "<th><input type='text' maxLength='2'  class='inputOgscalc technos project' id='Graviton' value='".$Graviton."'></th>" ."\n";         
+            
+            ?>
+        </tr>
+        <tr>
+            <td class="c_classement_recherche sum" colspan="<?php print ($nb_planete < 10) ? '10' : ($nb_planete + 1) * 2 ?>"><?php echo($lang['OGSCALC_TECHNOS_SUM']); ?></td>
+        </tr>        
+        <tr>
+        	<th></th><th colspan="2"><a><?php echo($lang['HOME_EMPIRE_METAL']); ?></a></th><th colspan="2"><a><?php echo($lang['HOME_EMPIRE_CRYSTAL']); ?></a></th><th colspan="2"><a><?php echo($lang['HOME_EMPIRE_DEUT']); ?></a></th><th colspan="2"><a><?php echo($lang['HOME_EMPIRE_ENERGY']); ?></a></th><th colspan="2"><a><?php echo($lang['GAME_FLEET_PT']); ?></a></th><th colspan="2"><a><?php echo($lang['GAME_FLEET_GT']); ?></a></th><th colspan="2"><a><?php echo($lang['OGSCALC_POINTS']); ?></a></th><th colspan="2"><a><?php echo($lang['OGSCALC_TIME']); ?></a></th>
+        </tr>
+        <tr>
+        	<th><a><?php echo($lang['OGSCALC_SUM']); ?></a></th><th colspan="2" id="sum_metal_technos"></th><th colspan="2" id="sum_crystal_technos"></th><th colspan="2" id="sum_deut_technos"></th><th colspan="2" id="sum_energy_technos"></th><th colspan="2" id="sum_pt_technos"></th><th colspan="2" id="sum_gt_technos"></th><th colspan="2" id="sum_points_technos"></th><th colspan="2" id="sum_time_technos"></th>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['OGSCALC_TIME_PRODUCTION']); ?></a></th><th colspan="2" id="time_metal_technos"></th><th colspan="2" id="time_crystal_technos"></th><th colspan="2" id="time_deut_technos"></th><th colspan="2"><a><?php echo($lang['OGSCALC_TIME_PRODUCTION_CONVERT']); ?></a></th><th colspan="2" id="time_convert_technos"></th>
+        </tr>
+        <?php } // fin de si view="planets" ?>
+        <tr>
+            <td class="c_defense" colspan="<?php print ($nb_planete < 10) ? '10' : ($nb_planete + 1) * 2 ?>"><?php echo($lang['HOME_EMPIRE_WEAPONS_TITLE']); ?></td>
+
+        </tr>
+        <tr>
+        	<th></th>
+        	 <?php        	 
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+            	 echo "\t" . "<th>".$lang['OGSCALC_CURRENT']."</th><th>".$lang['OGSCALC_PROJECT']."</th>" . "\n";
+            }
+            ?>            
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_WEAPONS_MISSILES']); ?></a></th>
+            <?php
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+                $LM = $user_defence[$i]["LM"];
+                if ($LM == "") $LM = "&nbsp;";
+                else $LM = number_format($LM, 0, ',', '');
+
+                echo "\t" . "<th><input class='inputOgscalc weapons current LM' type='text' maxLength='12' value='" . $LM . "' id='7" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc weapons project LM' type='text' maxLength='12' value='" . $LM . "' id='7" . ($i + 1 - $start) . "'></th>" ."\n";
+            }
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_WEAPONS_LLASERS']); ?></a></th>
+            <?php
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+                $LLE = $user_defence[$i]["LLE"];
+                if ($LLE == "") $LLE = "&nbsp;";
+                else $LLE = number_format($LLE, 0, ',', '');
+
+                echo "\t" . "<th><input class='inputOgscalc weapons current LLE' type='text' maxLength='12' value='" . $LLE . "' id='8" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc weapons project LLE' type='text' maxLength='12' value='" . $LLE . "' id='8" . ($i + 1 - $start) . "'></th>" ."\n";
+            }
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_WEAPONS_HLASERS']); ?></a></th>
+            <?php
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+                $LLO = $user_defence[$i]["LLO"];
+                if ($LLO == "") $LLO = "&nbsp;";
+                else $LLO = number_format($LLO, 0, ',', '');
+
+                echo "\t" . "<th><input class='inputOgscalc weapons current LLO' type='text' maxLength='12' value='" . $LLO . "' id='9" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc weapons project LLO' type='text' maxLength='12' value='" . $LLO . "' id='9" . ($i + 1 - $start) . "'></th>" ."\n";
+            }
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_WEAPONS_GAUSS']); ?></a></th>
+            <?php
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+                $CG = $user_defence[$i]["CG"];
+                if ($CG == "") $CG = "&nbsp;";
+                else $CG = number_format($CG, 0, ',', '');
+
+                echo "\t" . "<th><input class='inputOgscalc weapons current CG' type='text' maxLength='12' value='" . $CG . "' id='10" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc weapons project CG' type='text' maxLength='12' value='" . $CG . "' id='10" . ($i + 1 - $start) . "'></th>" ."\n";
+            }
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_WEAPONS_IONS']); ?></a></th>
+            <?php
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+                $AI = $user_defence[$i]["AI"];
+                if ($AI == "") $AI = "&nbsp;";
+                else $AI = number_format($AI, 0, ',', '');
+
+                echo "\t" . "<th><input class='inputOgscalc weapons current AI' type='text' maxLength='12' value='" . $AI . "' id='11" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc weapons project AI' type='text' maxLength='12' value='" . $AI . "' id='11" . ($i + 1 - $start) . "'></th>" ."\n";
+            }
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_WEAPONS_PLASMA']); ?></a></th>
+            <?php
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+                $LP = $user_defence[$i]["LP"];
+                if ($LP == "") $LP = "&nbsp;";
+                else $LP = number_format($LP, 0, ',', '');
+
+                echo "\t" . "<th><input class='inputOgscalc weapons current LP' type='text' maxLength='12' value='" . $LP . "' id='12" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc weapons project LP' type='text' maxLength='12' value='" . $LP . "' id='12" . ($i + 1 - $start) . "'></th>" ."\n";
+            }
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_WEAPONS_SMALLSHIELD']); ?></a></th>
+            <?php
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+                $PB = $user_defence[$i]["PB"];
+                if ($PB == "") $PB = "&nbsp;";
+
+                echo "\t" . "<th><input class='inputOgscalc weapons current PB' type='text' maxLength='12' value='" . $PB . "' id='13" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc weapons project PB' type='text' maxLength='12' value='" . $PB . "' id='13" . ($i + 1 - $start) . "'></th>" ."\n";
+            }
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_WEAPONS_LARGESHIELD']); ?></a></th>
+            <?php
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+                $GB = $user_defence[$i]["GB"];
+                if ($GB == "") $GB = "&nbsp;";
+
+                echo "\t" . "<th><input class='inputOgscalc weapons current weapons GB' type='text' maxLength='12' value='" . $GB. "' id='14" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc weapons project GB' type='text' maxLength='12' value='" . $GB. "' id='14" . ($i + 1 - $start) . "'></th>" ."\n";
+            }
+
+            if($view == "planets") {
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_WEAPONS_ANTI']); ?></a></th>
+            <?php
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+                $MIC = $user_defence[$i]["MIC"];
+                if ($MIC == "") $MIC = "&nbsp;";
+                else $MIC = number_format($MIC, 0, ',', '');
+
+                echo "\t" . "<th><input class='inputOgscalc weapons current MIC' type='text' maxLength='12' value='" . $MIC . "' id='19" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc project weapons MIC' type='text' maxLength='12' value='" . $MIC . "' id='19" . ($i + 1 - $start) . "'></th>" ."\n";
+            }
+            ?>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['HOME_EMPIRE_WEAPONS_INTER']); ?></a></th>
+            <?php
+            for ($i = $start; $i <= $start + $nb_planete - 1; $i++) {
+                $MIP = $user_defence[$i]["MIP"];
+                if ($MIP == "") $MIP = "&nbsp;";
+                else $MIP = number_format($MIP, 0, ',', '');
+
+                echo "\t" . "<th><input class='inputOgscalc weapons current MIP' type='text' maxLength='12' value='" . $MIP . "' id='18" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc weapons project MIP' type='text' maxLength='12' value='" . $MIP . "' id='18" . ($i + 1 - $start) . "'></th>" ."\n";
+            }
+
+            } // fin de si view="planets"
+            ?>
+        </tr>
+        <tr>
+            <td class="c_defense sum" colspan="<?php print ($nb_planete < 10) ? '10' : ($nb_planete + 1) * 2 ?>"><?php echo($lang['OGSCALC_WEAPONS_SUM']); ?></td>
+        </tr>
+        <tr>
+        	<th></th><th colspan="2"><a><?php echo($lang['HOME_EMPIRE_METAL']); ?></a></th><th colspan="2"><a><?php echo($lang['HOME_EMPIRE_CRYSTAL']); ?></a></th><th colspan="2"><a><?php echo($lang['HOME_EMPIRE_DEUT']); ?></a></th><th colspan="2"><a><?php echo($lang['GAME_FLEET_PT']); ?></a></th><th colspan="2"><a><?php echo($lang['GAME_FLEET_GT']); ?></a></th><th colspan="2"><a><?php echo($lang['OGSCALC_POINTS']); ?></a></th><th colspan="2"><a><?php echo($lang['OGSCALC_TIME']); ?></a></th>
+        </tr>
+        <tr>
+        	<th><a><?php echo($lang['OGSCALC_SUM']); ?></a></th><th colspan="2" id="sum_metal_weapons"></th><th colspan="2" id="sum_crystal_weapons"></th><th colspan="2" id="sum_deut_weapons"></th><th colspan="2" id="sum_pt_weapons"></th><th colspan="2" id="sum_gt_weapons"></th><th colspan="2" id="sum_points_weapons"></th><th colspan="2" id="sum_time_weapons"></th>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['OGSCALC_TIME_PRODUCTION']); ?></a></th><th colspan="2" id="time_metal_weapons"></th><th colspan="2" id="time_crystal_weapons"></th><th colspan="2" id="time_deut_weapons"></th><th colspan="2"><a><?php echo($lang['OGSCALC_TIME_PRODUCTION_CONVERT']); ?></a></th><th colspan="2" id="time_convert_weapons"></th>
+        </tr>
+        <tr>
+            <td class="c sumGlobal" colspan="<?php print ($nb_planete < 10) ? '10' : ($nb_planete + 1) * 2 ?>"><?php if($view == "planets") { echo($lang['OGSCALC_PLANETS_SUM']); } else { echo($lang['OGSCALC_MOONS_SUM']); } ?></td>
+        </tr>       
+        <tr>
+        	<th></th><th colspan="2"><a><?php echo($lang['HOME_EMPIRE_METAL']); ?></a></th><th colspan="2"><a><?php echo($lang['HOME_EMPIRE_CRYSTAL']); ?></a></th><th colspan="2"><a><?php echo($lang['HOME_EMPIRE_DEUT']); ?></a></th><?php if( $view == "planets" ) { ?><th colspan="2"><a><?php echo($lang['HOME_EMPIRE_ENERGY']); ?></a></th><?php  } ?><th colspan="2"><a><?php echo($lang['GAME_FLEET_PT']); ?></a></th><th colspan="2"><a><?php echo($lang['GAME_FLEET_GT']); ?></a></th><th colspan="2"><a><?php echo($lang['OGSCALC_POINTS']); ?></a></th><th colspan="2"><a><?php echo($lang['OGSCALC_TIME']); ?></a></th>
+        </tr>
+        <tr>
+        	<th><a><?php echo($lang['OGSCALC_SUM']); ?></a></th><th colspan="2" id="sum_metal"></th><th colspan="2" id="sum_crystal"></th><th colspan="2" id="sum_deut"></th><?php if( $view == "planets" ) { ?><th colspan="2" id="sum_energy"></th><?php  } ?><th colspan="2" id="sum_pt"></th><th colspan="2" id="sum_gt"></th><th colspan="2" id="sum_points"></th><th colspan="2" id="sum_time"></th>
+        </tr>
+        <tr>
+            <th><a><?php echo($lang['OGSCALC_TIME_PRODUCTION']); ?></a></th><th colspan="2" id="time_metal"></th><th colspan="2" id="time_crystal"></th><th colspan="2" id="time_deut"></th><th colspan="2"><a><?php echo($lang['OGSCALC_TIME_PRODUCTION_CONVERT']); ?></a></th><th colspan="2" id="time_convert"></th>
+        </tr>
+    </table>
+
+
+	<!-- MANAGE PRICES  -->
+	<script type="text/javascript">
+		var speedUni = "<?php echo $server_config['speed_uni']; ?>";
+		var IonsLevelUser = "<?php echo $Ions = $user_technology['Ions'] != '' ? $user_technology['Ions'] : '0'; ?>";
+		var RRILevelUser = "<?php echo $Ions = $user_technology['RRI'] != '' ? $user_technology['RRI'] : '0'; ?>";
+		var view = "<?php echo $view; ?>"; 
+        var productionUser = <?php echo json_encode($user_production['reel']); ?>;
+        var metalPerHour = parseInt(<?php echo $prodMetal; ?>, 10);
+        var crystalPerHour = parseInt(<?php echo $prodCrystal; ?>, 10);
+        var deutPerHour = parseInt(<?php echo $prodDeut; ?>, 10);
+	</script>
+	<script type="text/javascript" src="mod/<?php echo $mod_root; ?>/js/ogameFormula.js"></script>
+	<script type="text/javascript" src="mod/<?php echo $mod_root; ?>/js/buildingsCosts.js"></script>
+	<script type="text/javascript" src="mod/<?php echo $mod_root; ?>/js/technosCosts.js"></script>
+	<script type="text/javascript" src="mod/<?php echo $mod_root; ?>/js/destructiblesCosts.js"></script>
+	<script type="text/javascript" src="mod/<?php echo $mod_root; ?>/js/<?php echo $mod_root; ?>.js"></script>
+
+	<?php
+	/**
+	 * @param $txt
+	 * @param $nb_planete
+	 * @return string
+	 */
+	function read_th($txt, $nb_planete)
+	{
+	    $retour = "";
+	    if ($nb_planete > 9) {
+	        for ($i = 10; $i <= $nb_planete; $i++) {
+	            $retour = $retour . $txt;
+
+	        }
+	    }
+	    return $retour;
+	}
+
+
+
+
+	require_once("views/page_tail.php");
+
+	?>
