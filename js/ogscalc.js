@@ -143,7 +143,7 @@ function showResourceConverted() {
 	let metal = parseInt( document.getElementById( "metal_resource" ).value, 10 );
 	let crystal = parseInt( document.getElementById( "crystal_resource" ).value, 10 );
 	let deut = parseInt( document.getElementById( "deut_resource" ).value, 10 );
-	console.log( deut );
+
 	let rateMetal = parseInt( metalRate.value, 10 );
 	let rateCrystal = parseInt( crystalRate.value, 10 );
 
@@ -235,7 +235,10 @@ function initHtml() {
 
 	var inputs = document.getElementsByTagName('input');
 	for (var i = 0; i < inputs.length; i++) {
-		inputs[i].addEventListener("input", function (e) {
+		inputs[i].addEventListener("input", function () {
+			console.log( this );
+			this.value = keepOnlyNumber( this.value );
+			console.log( this.value );
 			showProductionConverted();
 			showResourceConverted();
 	    	objectifs();
@@ -243,6 +246,19 @@ function initHtml() {
 	}
 
 	setSumToZero();
+}
+
+function keepOnlyNumber( value ) {
+
+	for(let i = 0; i < value.length; i++) {
+		value = value.replace(/\D/g,"").replace(/^0+/, '');
+	}
+
+	if( value.length == 0 ) {
+		value = 0;
+	}	
+
+	return value;
 }
 
 function initOGSCalc() {

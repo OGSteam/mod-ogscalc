@@ -99,13 +99,13 @@
             <td class="c" colspan="<?php print ($nb_planete < 10) ? '10' : ($nb_planete + 1) * 2 ?>"><?php echo($lang['OGSCALC_RESOURCES']); ?></td>
         </tr>          
         <tr>
-            <th></th><th colspan="2"><a><?php echo($lang['HOME_EMPIRE_METAL']); ?></a></th><th colspan="2"><a><?php echo($lang['HOME_EMPIRE_CRYSTAL']); ?></a></th><th colspan="2"><a><?php echo($lang['HOME_EMPIRE_DEUT']); ?></a></th><th colspan="2"><a><?php echo($lang['OGSCALC_RESOURCES_RATE']); ?></a></th><th colspan="2"><input type="number" id="metal_rate" value="3" min="1" max="9"> / <input type="number" id="crystal_rate" value="2" min="1" max="9"> / 1</th>
+            <th></th><th colspan="2"><a><?php echo($lang['HOME_EMPIRE_METAL']); ?></a></th><th colspan="2"><a><?php echo($lang['HOME_EMPIRE_CRYSTAL']); ?></a></th><th colspan="2"><a><?php echo($lang['HOME_EMPIRE_DEUT']); ?></a></th><th colspan="2"><a><?php echo($lang['OGSCALC_RESOURCES_RATE']); ?></a></th><th colspan="2"><input type="text" class="inputOgscalc rate" id="metal_rate" maxlength="2" value="3" > / <input type="text" class="inputOgscalc rate" id="crystal_rate" maxlength="2" value="2" > / 1</th>
         </tr>           
         <tr>
             <th ><a><?php echo($lang['HOME_SIMU_PRODUCTION']); ?></a></th><th id="metal_prod" colspan="2"><?php echo(number_format($prodMetal, 0, ",", ".")); ?></th><th id="crystal_prod" colspan="2"><?php echo(number_format($prodCrystal, 0, ",", ".")); ?></th><th id="deut_prod" colspan="2"><?php echo(number_format($prodDeut, 0, ",", ".")); ?></th><th id="convert_prod" colspan="2"></th>
         </tr>           
         <tr>
-            <th ><a><?php echo($lang['OGSCALC_RESOURCES_ACCOUNT']); ?></a></th><th colspan="2"><input type="number" class="inputOgscalc" id="metal_resource" value="0" min="0" max="999999999999"></th><th colspan="2"><input type="number" class="inputOgscalc" id="crystal_resource" value="0" min="0" max="999999999999"></th><th colspan="2"><input type="number" class="inputOgscalc" id="deut_resource" value="0" min="0" max="999999999999"></th><th id="convert_resource" colspan="2"></th>
+            <th ><a><?php echo($lang['OGSCALC_RESOURCES_ACCOUNT']); ?></a></th><th colspan="2"><input type="text" class="inputOgscalc" id="metal_resource" maxlength="12" value="0" ></th><th colspan="2"><input type="text" class="inputOgscalc" id="crystal_resource" maxlength="12" value="0" ></th><th colspan="2"><input type="text" class="inputOgscalc" id="deut_resource" maxlength="12" value="0" ></th><th id="convert_resource" colspan="2"></th>
         </tr> 
         <tr>
             <td class="c" colspan="<?php print ($nb_planete < 10) ? '10' : ($nb_planete + 1) * 2 ?>"><?php echo($lang['HOME_EMPIRE_SUMMARY']); ?></td>
@@ -154,8 +154,8 @@
                 $M = $user_building[$i]["M"];
                 if ($M == "") $M = "&nbsp;";
 
-                echo "\t" . "<th><input class='building current M' type='number' min='0' max='99' value='" . $M . "' id='m" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='building project M' type='number' min='0' max='99' value='" . $M . "' id='m" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current M' type='text' maxLength='2'  value='" . $M . "' id='m" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project M' type='text' maxLength='2'  value='" . $M . "' id='m" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             ?>
         </tr>
@@ -166,8 +166,8 @@
                 $C = $user_building[$i]["C"];
                 if ($C == "") $C = "&nbsp;";
 
-                echo "\t" . "<th><input class='building current C' type='number' min='0' max='99' value='" . $C . "'' id='c" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='building project C' type='number' min='0' max='99' value='" . $C . "'' id='c" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current C' type='text' maxLength='2'  value='" . $C . "'' id='c" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project C' type='text' maxLength='2'  value='" . $C . "'' id='c" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             ?>
         </tr>
@@ -178,8 +178,8 @@
                 $D = $user_building[$i]["D"];
                 if ($D == "") $D = "&nbsp;";
 
-                echo "\t" . "<th><input class='building current D' type='number' min='0' max='99' value='" . $D . "'' id='d" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='building project D' type='number' min='0' max='99' value='" . $D . "'' id='d" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current D' type='text' maxLength='2'  value='" . $D . "'' id='d" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project D' type='text' maxLength='2'  value='" . $D . "'' id='d" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             ?>
         </tr>
@@ -190,8 +190,8 @@
                 $CES = $user_building[$i]["CES"];
                 if ($CES == "") $CES = "&nbsp;";
 
-                echo "\t" . "<th><input class='building current CES' type='number' min='0' max='99' value='" . $CES . "' id='ces" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='building project CES' type='number' min='0' max='99' value='" . $CES . "' id='ces" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current CES' type='text' maxLength='2'  value='" . $CES . "' id='ces" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project CES' type='text' maxLength='2'  value='" . $CES . "' id='ces" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             ?>
         </tr>
@@ -202,8 +202,8 @@
                 $CEF = $user_building[$i]["CEF"];
                 if ($CEF == "") $CEF = "&nbsp;";
 
-                echo "\t" . "<th><input class='building current CEF' type='number' min='0' max='99' value='" . $CEF . "' id='cef" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='building project CEF' type='number' min='0' max='99' value='" . $CEF . "' id='cef" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current CEF' type='text' maxLength='2'  value='" . $CEF . "' id='cef" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project CEF' type='text' maxLength='2'  value='" . $CEF . "' id='cef" . ($i + 1 - $start) . "'></th>" ."\n";
             }
 
             } // fin de si view="planets"
@@ -221,8 +221,8 @@
                 $UdR = $user_building[$i]["UdR"];
                 if ($UdR == "") $UdR = "&nbsp;";
 
-                echo "\t" . "<th><input class='building current UDR' type='number' min='0' max='99' value='" . $UdR . "' id='udr" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='building project UDR' type='number' min='0' max='99' value='" . $UdR . "'id='udr" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current UDR' type='text' maxLength='2'  value='" . $UdR . "' id='udr" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project UDR' type='text' maxLength='2'  value='" . $UdR . "'id='udr" . ($i + 1 - $start) . "'></th>" ."\n";
             }
 
             if($view == "planets") {
@@ -235,8 +235,8 @@
                 $UdN = $user_building[$i]["UdN"];
                 if ($UdN == "") $UdN = "&nbsp;";
 
-                echo "\t" . "<th><input class='building current UDN' type='number' min='0' max='99' value='" . $UdN . "' id='udn" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='building project UDN' type='number' min='0' max='99' value='" . $UdN . "' id='udn" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current UDN' type='text' maxLength='2'  value='" . $UdN . "' id='udn" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project UDN' type='text' maxLength='2'  value='" . $UdN . "' id='udn" . ($i + 1 - $start) . "'></th>" ."\n";
             }
 
             } // fin de si view="planets"
@@ -249,8 +249,8 @@
                 $CSp = $user_building[$i]["CSp"];
                 if ($CSp == "") $CSp = "&nbsp;";
 
-                echo "\t" . "<th><input class='building current CSP' type='number' min='0' max='99' value='" . $CSp . "' id='csp" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='building project CSP' type='number' min='0' max='99' value='" . $CSp . "' id='csp" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current CSP' type='text' maxLength='2'  value='" . $CSp . "' id='csp" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project CSP' type='text' maxLength='2'  value='" . $CSp . "' id='csp" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             ?>
         </tr>
@@ -261,8 +261,8 @@
                 $HM = $user_building[$i]["HM"];
                 if ($HM == "") $HM = "&nbsp;";
 
-                echo "\t" . "<th><input class='building current HM' type='number' min='0' max='99' value='" . $HM . "' id='hm" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='building project HM' type='number' min='0' max='99' value='" . $HM . "' id='hm" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current HM' type='text' maxLength='2'  value='" . $HM . "' id='hm" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project HM' type='text' maxLength='2'  value='" . $HM . "' id='hm" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             ?>
         </tr>
@@ -273,8 +273,8 @@
                 $HC = $user_building[$i]["HC"];
                 if ($HC == "") $HC = "&nbsp;";
 
-                echo "\t" . "<th><input class='building current HC' type='number' min='0' max='99' value='" . $HC . "' id='hc" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='building project HC' type='number' min='0' max='99' value='" . $HC . "' id='hc" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current HC' type='text' maxLength='2'  value='" . $HC . "' id='hc" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project HC' type='text' maxLength='2'  value='" . $HC . "' id='hc" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             ?>
         </tr>
@@ -285,8 +285,8 @@
                 $HD = $user_building[$i]["HD"];
                 if ($HD == "") $HD = "&nbsp;";
 
-                echo "\t" . "<th><input class='building current HD' type='number' min='0' max='99' value='" . $HD . "' id='hd" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='building project HD' type='number' min='0' max='99' value='" . $HD . "' id='hd" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current HD' type='text' maxLength='2'  value='" . $HD . "' id='hd" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project HD' type='text' maxLength='2'  value='" . $HD . "' id='hd" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             ?>
         </tr>
@@ -301,8 +301,8 @@
                 $Labs[] = intval($Lab);
                 if ($Lab == "") $Lab = "&nbsp;";
 
-                echo "\t" . "<th><input class='building current LAB' type='number' min='0' max='99' value='" . $Lab . "' id='lab" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='building project LAB' type='number' min='0' max='99' value='" . $Lab . "' id='lab" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current LAB' type='text' maxLength='2'  value='" . $Lab . "' id='lab" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project LAB' type='text' maxLength='2'  value='" . $Lab . "' id='lab" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             $maxLab = max($Labs);            
             if ( $server_config['ddr'] == 1 )
@@ -316,8 +316,8 @@
                 $DdR = $user_building[$i]["DdR"];
                 if ($DdR == "") $DdR = "&nbsp;";
 
-                echo "\t" . "<th><input class='building current DDR' type='number' min='0' max='99' value='" . $DdR . "' id='ddr" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='building project DDR' type='number' min='0' max='99' value='" . $DdR . "' id='ddr" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current DDR' type='text' maxLength='2'  value='" . $DdR . "' id='ddr" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project DDR' type='text' maxLength='2'  value='" . $DdR . "' id='ddr" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             }//Fin de si $server_config['ddr']
             ?>
@@ -329,8 +329,8 @@
                 $Ter = $user_building[$i]["Ter"];
                 if ($Ter == "") $Ter = "&nbsp;";
 
-                echo "\t" . "<th><input class='building current TER' type='number' min='0' max='99' value='" . $Ter . "' id='ter" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='building project TER' type='number' min='0' max='99' value='" . $Ter . "' id='ter" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current TER' type='text' maxLength='2'  value='" . $Ter . "' id='ter" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project TER' type='text' maxLength='2'  value='" . $Ter . "' id='ter" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             ?>
         </tr>
@@ -341,8 +341,8 @@
                 $Silo = $user_building[$i]["Silo"];
                 if ($Silo == "") $Silo = "&nbsp;";
 
-                echo "\t" . "<th><input class='building current SILO' type='number' min='0' max='99' value='" . $Silo . "' id='silo" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='building project SILO' type='number' min='0' max='99' value='" . $Silo . "' id='silo" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current SILO' type='text' maxLength='2'  value='" . $Silo . "' id='silo" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project SILO' type='text' maxLength='2'  value='" . $Silo . "' id='silo" . ($i + 1 - $start) . "'></th>" ."\n";
             }
 
             } // fin de si view="planets"
@@ -356,8 +356,8 @@
                 $BaLu = $user_building[$i]["BaLu"];
                 if ($BaLu == "") $BaLu = "&nbsp;";
 
-                echo "\t" . "<th><input class='building current BALU' type='number' min='0' max='99' value='" . $BaLu . "' id='balu" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='building project BALU' type='number' min='0' max='99' value='" . $BaLu . "' id='balu" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current BALU' type='text' maxLength='2'  value='" . $BaLu . "' id='balu" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project BALU' type='text' maxLength='2'  value='" . $BaLu . "' id='balu" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             ?>
         </tr>
@@ -368,8 +368,8 @@
                 $Pha = $user_building[$i]["Pha"];
                 if ($Pha == "") $Pha = "&nbsp;";
 
-                echo "\t" . "<th><input class='building current PHA' type='number' min='0' max='99' value='" . $Pha . "' id='pha" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='building project PHA' type='number' min='0' max='99' value='" . $Pha . "' id='pha" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current PHA' type='text' maxLength='2'  value='" . $Pha . "' id='pha" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project PHA' type='text' maxLength='2'  value='" . $Pha . "' id='pha" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             ?>
         </tr>
@@ -380,8 +380,8 @@
                 $PoSa = $user_building[$i]["PoSa"];
                 if ($PoSa == "") $PoSa = "&nbsp;";
 
-                echo "\t" . "<th><input class='building current POSA' type='number' min='0' max='99' value='" . $PoSa . "' id='posa" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='building project POSA' type='number' min='0' max='99' value='" . $PoSa . "' id='posa" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current POSA' type='text' maxLength='2'  value='" . $PoSa . "' id='posa" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project POSA' type='text' maxLength='2'  value='" . $PoSa . "' id='posa" . ($i + 1 - $start) . "'></th>" ."\n";
             }
 
             } // fin de sinon view="planets"
@@ -420,8 +420,8 @@
                 if ($Sat == "") $Sat = "&nbsp;";
                 else $Sat = number_format($Sat, 0, ',', '');
 
-                echo "\t" . "<th><input type='number' min='0' max='999999999999' class='inputOgscalc divers current Sat' id='6" . ($i + 1 - $start) . "' value='" . $Sat . "'></th>" .
-                "<th><input type='number' min='0' max='999999999999' class='inputOgscalc divers project Sat' value='" . $Sat . "' id='6" . ($i + 1 - $start) . "' ></th>" ."\n";
+                echo "\t" . "<th><input type='text' maxLength='12' class='inputOgscalc divers current Sat' id='6" . ($i + 1 - $start) . "' value='" . $Sat . "'></th>" .
+                "<th><input type='text' maxLength='12' class='inputOgscalc divers project Sat' value='" . $Sat . "' id='6" . ($i + 1 - $start) . "' ></th>" ."\n";
             }            
             ?>
         </tr>
@@ -453,8 +453,8 @@
 
                 $Esp = $user_technology["Esp"] != "" ? $user_technology["Esp"] : "0";
 
-                echo "\t" . "<th><input type='number' min='0' max='99' class='technos current' id='Esp' value='".$Esp."'></th>" .
-                "<th><input type='number' min='0' max='99' class='technos project' id='Esp' value='".$Esp."'></th>" ."\n";
+                echo "\t" . "<th><input type='text' maxLength='2'  class='inputOgscalc technos current' id='Esp' value='".$Esp."'></th>" .
+                "<th><input type='text' maxLength='2'  class='inputOgscalc technos project' id='Esp' value='".$Esp."'></th>" ."\n";
             ?>
         </tr>
         <tr>
@@ -463,8 +463,8 @@
 
                 $Ordi = $user_technology["Ordi"] != "" ? $user_technology["Ordi"] : "0";
 
-                echo "\t" . "<th><input type='number' min='0' max='99' class='technos current' id='Ordi' value='".$Ordi."'></th>" .
-                "<th><input type='number' min='0' max='99' class='technos project' id='Ordi' value='".$Ordi."'></th>" ."\n";
+                echo "\t" . "<th><input type='text' maxLength='2'  class='inputOgscalc technos current' id='Ordi' value='".$Ordi."'></th>" .
+                "<th><input type='text' maxLength='2'  class='inputOgscalc technos project' id='Ordi' value='".$Ordi."'></th>" ."\n";
             ?>
         </tr>
         <tr>
@@ -473,8 +473,8 @@
 
                 $Armes = $user_technology["Armes"] != "" ? $user_technology["Armes"] : "0";
 
-                echo "\t" . "<th><input type='number' min='0' max='99' class='technos current' id='Armes' value='".$Armes."'></th>" .
-                "<th><input type='number' min='0' max='99' class='technos project' id='Armes' value='".$Armes."'></th>" ."\n";
+                echo "\t" . "<th><input type='text' maxLength='2'  class='inputOgscalc technos current' id='Armes' value='".$Armes."'></th>" .
+                "<th><input type='text' maxLength='2'  class='inputOgscalc technos project' id='Armes' value='".$Armes."'></th>" ."\n";
             ?>
         </tr>
         <tr>
@@ -483,8 +483,8 @@
 
                 $Bouclier = $user_technology["Bouclier"] != "" ? $user_technology["Bouclier"] : "0";
                 
-                echo "\t" . "<th><input type='number' min='0' max='99' class='technos current' id='Bouclier' value='".$Bouclier."'></th>" .
-                "<th><input type='number' min='0' max='99' class='technos project' id='Bouclier' value='".$Bouclier."'></th>" ."\n";        
+                echo "\t" . "<th><input type='text' maxLength='2'  class='inputOgscalc technos current' id='Bouclier' value='".$Bouclier."'></th>" .
+                "<th><input type='text' maxLength='2'  class='inputOgscalc technos project' id='Bouclier' value='".$Bouclier."'></th>" ."\n";        
             ?>
         </tr>
         <tr>
@@ -493,8 +493,8 @@
 
             	$Protection = $user_technology["Protection"] != "" ? $user_technology["Protection"] : "0";
 
-                echo "\t" . "<th><input type='number' min='0' max='99' class='technos current' id='Protection' value='".$Protection."'></th>" .
-                "<th><input type='number' min='0' max='99' class='technos project' id='Protection' value='".$Protection."'></th>" ."\n";
+                echo "\t" . "<th><input type='text' maxLength='2'  class='inputOgscalc technos current' id='Protection' value='".$Protection."'></th>" .
+                "<th><input type='text' maxLength='2'  class='inputOgscalc technos project' id='Protection' value='".$Protection."'></th>" ."\n";
             ?>
         </tr>
         <tr>
@@ -503,8 +503,8 @@
 
                 $NRJ = $user_technology["NRJ"] != "" ? $user_technology["NRJ"] : "0";
 
-                echo "\t" . "<th><input type='number' min='0' max='99' class='technos current' id='NRJ' value='".$NRJ."'></th>" .
-                "<th><input type='number' min='0' max='99' class='technos project' id='NRJ' value='".$NRJ."'></th>" ."\n";
+                echo "\t" . "<th><input type='text' maxLength='2'  class='inputOgscalc technos current' id='NRJ' value='".$NRJ."'></th>" .
+                "<th><input type='text' maxLength='2'  class='inputOgscalc technos project' id='NRJ' value='".$NRJ."'></th>" ."\n";
             ?>
         </tr>
         <tr>
@@ -513,8 +513,8 @@
 
             	$Hyp = $user_technology["Hyp"] != "" ? $user_technology["Hyp"] : "0";
 
-                echo "\t" . "<th><input type='number' min='0' max='99' class='technos current' id='Hyp' value='".$Hyp."'></th>" .
-                "<th><input type='number' min='0' max='99' class='technos project' id='Hyp' value='".$Hyp."'></th>" ."\n";
+                echo "\t" . "<th><input type='text' maxLength='2'  class='inputOgscalc technos current' id='Hyp' value='".$Hyp."'></th>" .
+                "<th><input type='text' maxLength='2'  class='inputOgscalc technos project' id='Hyp' value='".$Hyp."'></th>" ."\n";
             ?>
         </tr>
         <tr>
@@ -523,8 +523,8 @@
 
                 $RC = $user_technology["RC"] != "" ? $user_technology["RC"] : "0";
 
-                echo "\t" . "<th><input type='number' min='0' max='99' class='technos current' id='RC' value='".$RC."'></th>" .
-                "<th><input type='number' min='0' max='99' class='technos project' id='RC' value='".$RC."'></th>" ."\n";
+                echo "\t" . "<th><input type='text' maxLength='2'  class='inputOgscalc technos current' id='RC' value='".$RC."'></th>" .
+                "<th><input type='text' maxLength='2'  class='inputOgscalc technos project' id='RC' value='".$RC."'></th>" ."\n";
             ?>
         </tr>
         <tr>
@@ -533,8 +533,8 @@
 
                 $RI = $user_technology["RI"] != "" ? $user_technology["RI"] : "0";
 
-                echo "\t" . "<th><input type='number' min='0' max='99' class='technos current' id='RI' value='".$RI."'></th>" .
-                "<th><input type='number' min='0' max='99' class='technos project' id='RI' value='".$RI."'></th>" ."\n";               
+                echo "\t" . "<th><input type='text' maxLength='2'  class='inputOgscalc technos current' id='RI' value='".$RI."'></th>" .
+                "<th><input type='text' maxLength='2'  class='inputOgscalc technos project' id='RI' value='".$RI."'></th>" ."\n";               
             ?>
         </tr>
         <tr>
@@ -543,8 +543,8 @@
 
                 $PH = $user_technology["PH"] != "" ? $user_technology["PH"] : "0";
 
-                echo "\t" . "<th><input type='number' min='0' max='99' class='technos current' id='PH' value='".$PH."'></th>" .
-                "<th><input type='number' min='0' max='99' class='technos project' id='PH' value='".$PH."'></th>" ."\n";
+                echo "\t" . "<th><input type='text' maxLength='2'  class='inputOgscalc technos current' id='PH' value='".$PH."'></th>" .
+                "<th><input type='text' maxLength='2'  class='inputOgscalc technos project' id='PH' value='".$PH."'></th>" ."\n";
             ?>
         </tr>
         <tr>
@@ -553,8 +553,8 @@
                 
                 $Laser = $user_technology["Laser"] != "" ? $user_technology["Laser"] : "0";
 
-                echo "\t" . "<th><input type='number' min='0' max='99' class='technos current' id='Laser' value='".$Laser."'></th>" .
-                "<th><input type='number' min='0' max='99' class='technos project' id='Laser' value='".$Laser."'></th>" ."\n";
+                echo "\t" . "<th><input type='text' maxLength='2'  class='inputOgscalc technos current' id='Laser' value='".$Laser."'></th>" .
+                "<th><input type='text' maxLength='2'  class='inputOgscalc technos project' id='Laser' value='".$Laser."'></th>" ."\n";
             ?>
         </tr>
         <tr>
@@ -563,8 +563,8 @@
 
                 $Ions = $user_technology["Ions"] != "" ? $user_technology["Ions"] : "0";
 
-                echo "\t" . "<th><input type='number' min='0' max='99' class='technos current' id='Ions' value='".$Ions."'></th>" .
-                "<th><input type='number' min='0' max='99' class='technos project' id='Ions' value='".$Ions."'></th>" ."\n";
+                echo "\t" . "<th><input type='text' maxLength='2'  class='inputOgscalc technos current' id='Ions' value='".$Ions."'></th>" .
+                "<th><input type='text' maxLength='2'  class='inputOgscalc technos project' id='Ions' value='".$Ions."'></th>" ."\n";
             ?>
         </tr>
         <tr>
@@ -573,8 +573,8 @@
 
                 $Plasma = $user_technology["Plasma"] != "" ? $user_technology["Plasma"] : "0";
 
-                echo "\t" . "<th><input type='number' min='0' max='99' class='technos current' id='Plasma' value='".$Plasma."'></th>" .
-                "<th><input type='number' min='0' max='99' class='technos project' id='Plasma' value='".$Plasma."'></th>" ."\n";
+                echo "\t" . "<th><input type='text' maxLength='2'  class='inputOgscalc technos current' id='Plasma' value='".$Plasma."'></th>" .
+                "<th><input type='text' maxLength='2'  class='inputOgscalc technos project' id='Plasma' value='".$Plasma."'></th>" ."\n";
             ?>
         </tr>
         <tr>
@@ -583,8 +583,8 @@
 
 	            $RRI = $user_technology["RRI"] != "" ? $user_technology["RRI"] : "0";
 
-	            echo "\t" . "<th><input type='number' min='0' max='99' class='technos current' id='RRI' value='".$RRI."'></th>" .
-                "<th><input type='number' min='0' max='99' class='technos project' id='RRI' value='".$RRI."'></th>" ."\n";        
+	            echo "\t" . "<th><input type='text' maxLength='2'  class='inputOgscalc technos current' id='RRI' value='".$RRI."'></th>" .
+                "<th><input type='text' maxLength='2'  class='inputOgscalc technos project' id='RRI' value='".$RRI."'></th>" ."\n";        
             ?>
         </tr>
         <tr>
@@ -593,8 +593,8 @@
 	            
 	            $Astrophysique = $user_technology["Astrophysique"] != "" ? $user_technology["Astrophysique"] : "0";
 
-	            echo "\t" . "<th><input type='number' min='0' max='99' class='technos current' id='Astrophysique' value='".$Astrophysique."'></th>" .
-                "<th><input type='number' min='0' max='99' class='technos project' id='Astrophysique' value='".$Astrophysique."'></th>" ."\n";
+	            echo "\t" . "<th><input type='text' maxLength='2'  class='inputOgscalc technos current' id='Astrophysique' value='".$Astrophysique."'></th>" .
+                "<th><input type='text' maxLength='2'  class='inputOgscalc technos project' id='Astrophysique' value='".$Astrophysique."'></th>" ."\n";
             ?>
         </tr>
         <tr>
@@ -603,8 +603,8 @@
 	           
 	           $Graviton = $user_technology["Graviton"] != "" ? $user_technology["Graviton"] : "0";	                  
 
-	            echo "\t" . "<th><input type='number' min='0' max='99' class='technos current' id='Graviton' value='".$Graviton."'></th>" .
-                "<th><input type='number' min='0' max='99' class='technos project' id='Graviton' value='".$Graviton."'></th>" ."\n";         
+	            echo "\t" . "<th><input type='text' maxLength='2'  class='inputOgscalc technos current' id='Graviton' value='".$Graviton."'></th>" .
+                "<th><input type='text' maxLength='2'  class='inputOgscalc technos project' id='Graviton' value='".$Graviton."'></th>" ."\n";         
             
             ?>
         </tr>
@@ -641,8 +641,8 @@
                 if ($LM == "") $LM = "&nbsp;";
                 else $LM = number_format($LM, 0, ',', '');
 
-                echo "\t" . "<th><input class='inputOgscalc weapons current LM' type='number' min='0' max='999999999999' value='" . $LM . "' id='7" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='inputOgscalc weapons project LM' type='number' min='0' max='999999999999' value='" . $LM . "' id='7" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc weapons current LM' type='text' maxLength='12' value='" . $LM . "' id='7" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc weapons project LM' type='text' maxLength='12' value='" . $LM . "' id='7" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             ?>
         </tr>
@@ -654,8 +654,8 @@
                 if ($LLE == "") $LLE = "&nbsp;";
                 else $LLE = number_format($LLE, 0, ',', '');
 
-                echo "\t" . "<th><input class='inputOgscalc weapons current LLE' type='number' min='0' max='999999999999' value='" . $LLE . "' id='8" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='inputOgscalc weapons project LLE' type='number' min='0' max='999999999999' value='" . $LLE . "' id='8" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc weapons current LLE' type='text' maxLength='12' value='" . $LLE . "' id='8" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc weapons project LLE' type='text' maxLength='12' value='" . $LLE . "' id='8" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             ?>
         </tr>
@@ -667,8 +667,8 @@
                 if ($LLO == "") $LLO = "&nbsp;";
                 else $LLO = number_format($LLO, 0, ',', '');
 
-                echo "\t" . "<th><input class='inputOgscalc weapons current LLO' type='number' min='0' max='999999999999' value='" . $LLO . "' id='9" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='inputOgscalc weapons project LLO' type='number' min='0' max='999999999999' value='" . $LLO . "' id='9" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc weapons current LLO' type='text' maxLength='12' value='" . $LLO . "' id='9" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc weapons project LLO' type='text' maxLength='12' value='" . $LLO . "' id='9" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             ?>
         </tr>
@@ -680,8 +680,8 @@
                 if ($CG == "") $CG = "&nbsp;";
                 else $CG = number_format($CG, 0, ',', '');
 
-                echo "\t" . "<th><input class='inputOgscalc weapons current CG' type='number' min='0' max='999999999999' value='" . $CG . "' id='10" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='inputOgscalc weapons project CG' type='number' min='0' max='999999999999' value='" . $CG . "' id='10" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc weapons current CG' type='text' maxLength='12' value='" . $CG . "' id='10" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc weapons project CG' type='text' maxLength='12' value='" . $CG . "' id='10" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             ?>
         </tr>
@@ -693,8 +693,8 @@
                 if ($AI == "") $AI = "&nbsp;";
                 else $AI = number_format($AI, 0, ',', '');
 
-                echo "\t" . "<th><input class='inputOgscalc weapons current AI' type='number' min='0' max='999999999999' value='" . $AI . "' id='11" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='inputOgscalc weapons project AI' type='number' min='0' max='999999999999' value='" . $AI . "' id='11" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc weapons current AI' type='text' maxLength='12' value='" . $AI . "' id='11" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc weapons project AI' type='text' maxLength='12' value='" . $AI . "' id='11" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             ?>
         </tr>
@@ -706,8 +706,8 @@
                 if ($LP == "") $LP = "&nbsp;";
                 else $LP = number_format($LP, 0, ',', '');
 
-                echo "\t" . "<th><input class='inputOgscalc weapons current LP' type='number' min='0' max='999999999999' value='" . $LP . "' id='12" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='inputOgscalc weapons project LP' type='number' min='0' max='999999999999' value='" . $LP . "' id='12" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc weapons current LP' type='text' maxLength='12' value='" . $LP . "' id='12" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc weapons project LP' type='text' maxLength='12' value='" . $LP . "' id='12" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             ?>
         </tr>
@@ -718,8 +718,8 @@
                 $PB = $user_defence[$i]["PB"];
                 if ($PB == "") $PB = "&nbsp;";
 
-                echo "\t" . "<th><input class='inputOgscalc weapons current PB' type='number' min='0' max='999999999999' value='" . $PB . "' id='13" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='inputOgscalc weapons project PB' type='number' min='0' max='999999999999' value='" . $PB . "' id='13" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc weapons current PB' type='text' maxLength='12' value='" . $PB . "' id='13" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc weapons project PB' type='text' maxLength='12' value='" . $PB . "' id='13" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             ?>
         </tr>
@@ -730,8 +730,8 @@
                 $GB = $user_defence[$i]["GB"];
                 if ($GB == "") $GB = "&nbsp;";
 
-                echo "\t" . "<th><input class='inputOgscalc weapons current weapons GB' type='number' min='0' max='999999999999' value='" . $GB. "' id='14" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='inputOgscalc weapons project GB' type='number' min='0' max='999999999999' value='" . $GB. "' id='14" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc weapons current weapons GB' type='text' maxLength='12' value='" . $GB. "' id='14" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc weapons project GB' type='text' maxLength='12' value='" . $GB. "' id='14" . ($i + 1 - $start) . "'></th>" ."\n";
             }
 
             if($view == "planets") {
@@ -745,8 +745,8 @@
                 if ($MIC == "") $MIC = "&nbsp;";
                 else $MIC = number_format($MIC, 0, ',', '');
 
-                echo "\t" . "<th><input class='inputOgscalc weapons current MIC' type='number' min='0' max='999999999999' value='" . $MIC . "' id='19" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='inputOgscalc project weapons MIC' type='number' min='0' max='999999999999' value='" . $MIC . "' id='19" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc weapons current MIC' type='text' maxLength='12' value='" . $MIC . "' id='19" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc project weapons MIC' type='text' maxLength='12' value='" . $MIC . "' id='19" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             ?>
         </tr>
@@ -758,8 +758,8 @@
                 if ($MIP == "") $MIP = "&nbsp;";
                 else $MIP = number_format($MIP, 0, ',', '');
 
-                echo "\t" . "<th><input class='inputOgscalc weapons current MIP' type='number' min='0' max='999999999999' value='" . $MIP . "' id='18" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='inputOgscalc weapons project MIP' type='number' min='0' max='999999999999' value='" . $MIP . "' id='18" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc weapons current MIP' type='text' maxLength='12' value='" . $MIP . "' id='18" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc weapons project MIP' type='text' maxLength='12' value='" . $MIP . "' id='18" . ($i + 1 - $start) . "'></th>" ."\n";
             }
 
             } // fin de si view="planets"

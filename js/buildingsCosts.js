@@ -70,8 +70,8 @@ function buildingCost( project ) {
     		buildProject = fusion( projectValue );
     		buildCurrent = fusion( currentValue );
     	} else {
-    		buildProject = building( project.classList[2], projectValue );
-    		buildCurrent = building( current.classList[2], currentValue );
+    		buildProject = building( project.classList[3], projectValue );
+    		buildCurrent = building( current.classList[3], currentValue );
     	}
     	//need temp val to calc time
         let tmpProjectM = Math.floor( buildProject.metal );
@@ -121,9 +121,9 @@ function buildingCost( project ) {
 	    	buildingDiff = fusion( currentValue - diffLvl );
 	    	buildingDestPrice = fusionDest( currentValue, projectValue );
 	    } else {
-	    	buildingCurrent = building( current.classList[2], currentValue );
-	    	buildingDiff = building( current.classList[2], currentValue - diffLvl );
-	    	buildingDestPrice = buildingDest( project.classList[2], currentValue, projectValue );
+	    	buildingCurrent = building( current.classList[3], currentValue );
+	    	buildingDiff = building( current.classList[3], currentValue - diffLvl );
+	    	buildingDestPrice = buildingDest( project.classList[3], currentValue, projectValue );
 	    }
     	//need temp val to calc time
     	let tmpProjectM = 0;
@@ -148,8 +148,8 @@ function buildingCost( project ) {
 		    	TEMPLow = fusion( currentLvl - 2 );
 		    	TEMPSup = fusion( currentLvl - 1 );
 		    } else {
-		    	TEMPLow = building( current.classList[2], currentLvl - 2 );
-		    	TEMPSup = building( current.classList[2], currentLvl - 1 );
+		    	TEMPLow = building( current.classList[3], currentLvl - 2 );
+		    	TEMPSup = building( current.classList[3], currentLvl - 1 );
 		    }
     		costProjectBuildingT += timeConstBuildings( TEMPSup.metal - TEMPLow.metal, TEMPSup.crystal - TEMPLow.crystal, position );		   
     		currentLvl--;
