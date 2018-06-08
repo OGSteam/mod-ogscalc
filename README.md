@@ -1,8 +1,8 @@
 #### mod-ogscalc
 
-## Auhtor
+## Author
 
-- Aeris
+- [Aeris](https://github.com/aeris)
 
 ## Update 2016
 
