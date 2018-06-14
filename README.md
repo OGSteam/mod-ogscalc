@@ -10,7 +10,7 @@
 
 ## Update 2018
 
-- Choubakawa
+- [Choubakawa](https://github.com/Choubakawa)
 
 ### OGSCalc V2
 
