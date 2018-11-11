@@ -7,9 +7,12 @@ function technosCosts( project ) {
 
 	let current = document.getElementById( project.id );
 
-	if( project.value > current.value ) {
+	let currentValue = parseInt( current.value, 10 );
+	let projectValue = parseInt( project.value, 10 );
+	
+	if( projectValue > currentValue ) {
 
-		let tech = costTechnos( project.id, current.value, project.value );
+		let tech = costTechnos( project.id, currentValue, projectValue );
 		costProjectTechnoM = precisionRound( tech.metal, -2 );
 		costProjectTechnoC = precisionRound( tech.crystal, -2 );
 		costProjectTechnoD = precisionRound( tech.deut, -2 );

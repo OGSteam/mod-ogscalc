@@ -5,6 +5,7 @@
 * @package Calculatrice universelle
 * @author Aeris
 * @update xaviernuma - 2015
+* @update Athar - 2018
 * @link http://www.ogsteam.fr/
 **/
 

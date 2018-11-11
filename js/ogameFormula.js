@@ -11,6 +11,7 @@ priceBuildings["HM"] = [1000, 0, 0, 0];
 priceBuildings["HC"] = [1000, 500, 0, 0];
 priceBuildings["HD"] = [1000, 1000, 0, 0];
 priceBuildings["LAB"] = [200, 400, 200, 0];
+priceBuildings["DDR"] = [20000, 40000, 0, 0];
 priceBuildings["TER"] = [0, 50000, 100000, 1000];
 priceBuildings["SILO"] = [20000, 20000, 1000, 0];
 priceBuildings["BALU"] = [20000, 40000, 20000, 0];

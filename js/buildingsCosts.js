@@ -209,6 +209,8 @@ function getPosition( current ) {
 		position = current.id.replace('hd','');
 	} else if( current.classList.contains( "LAB" ) ) {
 		position = current.id.replace('lab','');
+	} else if( current.classList.contains( "DDR" ) ) {
+		position = current.id.replace('ddr','');
 	} else if( current.classList.contains( "TER" ) ) {
 		position = current.id.replace('ter','');
 	} else if( current.classList.contains( "SILO" ) ) {

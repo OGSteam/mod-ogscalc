@@ -29,9 +29,12 @@ function destructiblesCosts( project ) {
 	let time = 0;
 
 	let current = document.getElementById( project.id );
-
-	if( project.value > current.value ) {
-		let toBuild = project.value - current.value;
+	
+	let currentValue = parseInt( current.value, 10 );
+	let projectValue = parseInt( project.value, 10 );
+	
+	if( projectValue > currentValue ) {
+		let toBuild = projectValue - currentValue;
 		let destructible = costDestructibles( project.classList[3], toBuild )
 		metal = destructible.metal;
 		crystal = destructible.crystal;

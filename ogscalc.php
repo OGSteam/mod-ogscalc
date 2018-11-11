@@ -6,6 +6,7 @@
 * @author Aeris
 * @update xaviernuma - 2016
 * @update Choubakawa - 2018
+* @update Athar - 2018
 * @link http://www.ogsteam.fr/
 **/
 
@@ -29,6 +30,7 @@
 	list ( $mod_version, $mod_root ) = $db->sql_fetch_row($ta_resultat);
 
 	require_once( "mod/".$mod_root."/lang/fr/lang.php" );
+	require_once( "mod/".$mod_root."/functions.php" );
 
 	/*INIT VALUES*/
 	$user_empire = user_get_empire($user_data['user_id']);
@@ -42,7 +44,8 @@
 	else $view = "planets";
 	$start = $view == "planets" ? 101 : 201;
 
-	$nb_planete = find_nb_planete_user($user_data['user_id']);
+	$nb_planete = ogscalc_find_nb_planete_user_real($user_data['user_id']);
+	$nb_moon = ogscalc_find_nb_moon_user($user_data['user_id']);
 	$name = $coordinates = $fields = $temperature_min = $temperature_max = $satellite = "";
     
     $prodMetal = 0;
@@ -62,12 +65,26 @@
     <table width="100%">
         <tr>
             <?php
+			
+			// verification de compte de planete/lune avec la technologie astro
+			$astro = astro_max_planete($user_technology['Astrophysique']);
 
+			if ((($nb_planete > $astro) || ($nb_moon > $astro)) && ($user_technology != false)) {
+				echo '<tr>';
+				echo '<td class="c" colspan="' . ($nb_planete < 10 ? '10' : $nb_planete + 1) . '">';
+				echo ($nb_planete > $astro) ? $lang['HOME_EMPIRE_ERROR'].' '.$lang['HOME_EMPIRE_ERROR_PLANET'].'<br>' : '';
+				echo ($nb_moon > $astro) ? $lang['HOME_EMPIRE_ERROR'].' '.$lang['HOME_EMPIRE_ERROR_MOON'].'<br>' : '';
+				echo '</td>';
+				echo '</tr>';
+			}
+			
             $colspan = (($nb_planete + 1)*2) / 2;
             $colspan_planete = floor($colspan);
             $colspan_lune = ceil($colspan);
 
-            if ($view == "planets") {
+			if ($nb_moon == 0) {
+				echo "<th colspan='$colspan_planete'><a>".$lang['HOME_EMPIRE_PLANET']."</a></th>";
+			} elseif ($view == "planets") {
                 echo "<th colspan='$colspan_planete'><a>".$lang['HOME_EMPIRE_PLANET']."</a></th>";
                 echo "<td class='c' align='center' colspan='$colspan_lune' onClick=\"window.location = 'index.php?action=ogscalc&amp;view=moons';\"><a style='cursor:pointer'><font color='lime'>".$lang['HOME_EMPIRE_MOON']."</font></a></td>";
             } else {
@@ -76,25 +93,6 @@
             }
             ?>
         </tr>
-
-        <?php
-
-        // verification de compte de planete/lune avec la technologie astro
-        $astro = astro_max_planete($user_technology['Astrophysique']);
-
-        if (((find_nb_planete_user($user_data['user_id']) > $astro) || (find_nb_moon_user($user_data['user_id']) > $astro)) && ($user_technology != false)) {
-            echo '<tr>';
-            echo '<td class="c" colspan="' . ($nb_planete < 10 ? '10' : $nb_planete + 1) . '">';
-            echo $lang['HOME_EMPIRE_ERROR'].' ';
-            echo (find_nb_planete_user($user_data['user_id']) > $astro) ? $lang['HOME_EMPIRE_ERROR_PLANET'].'<br>' : '';
-            echo (find_nb_moon_user($user_data['user_id']) > $astro) ? $lang['HOME_EMPIRE_ERROR_MOON'].'<br>' : '';
-            echo '</td>';
-            echo '</tr>';
-        }
-
-        ?>
-
-
         <tr>
             <td class="c" colspan="<?php print ($nb_planete < 10) ? '10' : ($nb_planete + 1) * 2 ?>"><?php echo($lang['OGSCALC_RESOURCES']); ?></td>
         </tr>          
@@ -154,8 +152,8 @@
                 $M = $user_building[$i]["M"];
                 if ($M == "") $M = "&nbsp;";
 
-                echo "\t" . "<th><input class='inputOgscalc building current M' type='text' maxLength='2'  value='" . $M . "' id='m" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='inputOgscalc building project M' type='text' maxLength='2'  value='" . $M . "' id='m" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current M' type='text' maxLength='2' value='" . $M . "' id='m" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project M' type='text' maxLength='2' value='" . $M . "' id='m" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             ?>
         </tr>
@@ -166,8 +164,8 @@
                 $C = $user_building[$i]["C"];
                 if ($C == "") $C = "&nbsp;";
 
-                echo "\t" . "<th><input class='inputOgscalc building current C' type='text' maxLength='2'  value='" . $C . "'' id='c" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='inputOgscalc building project C' type='text' maxLength='2'  value='" . $C . "'' id='c" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current C' type='text' maxLength='2' value='" . $C . "' id='c" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project C' type='text' maxLength='2' value='" . $C . "' id='c" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             ?>
         </tr>
@@ -178,8 +176,8 @@
                 $D = $user_building[$i]["D"];
                 if ($D == "") $D = "&nbsp;";
 
-                echo "\t" . "<th><input class='inputOgscalc building current D' type='text' maxLength='2'  value='" . $D . "'' id='d" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='inputOgscalc building project D' type='text' maxLength='2'  value='" . $D . "'' id='d" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current D' type='text' maxLength='2' value='" . $D . "' id='d" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project D' type='text' maxLength='2' value='" . $D . "' id='d" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             ?>
         </tr>
@@ -190,8 +188,8 @@
                 $CES = $user_building[$i]["CES"];
                 if ($CES == "") $CES = "&nbsp;";
 
-                echo "\t" . "<th><input class='inputOgscalc building current CES' type='text' maxLength='2'  value='" . $CES . "' id='ces" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='inputOgscalc building project CES' type='text' maxLength='2'  value='" . $CES . "' id='ces" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current CES' type='text' maxLength='2' value='" . $CES . "' id='ces" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project CES' type='text' maxLength='2' value='" . $CES . "' id='ces" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             ?>
         </tr>
@@ -202,8 +200,8 @@
                 $CEF = $user_building[$i]["CEF"];
                 if ($CEF == "") $CEF = "&nbsp;";
 
-                echo "\t" . "<th><input class='inputOgscalc building current CEF' type='text' maxLength='2'  value='" . $CEF . "' id='cef" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='inputOgscalc building project CEF' type='text' maxLength='2'  value='" . $CEF . "' id='cef" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current CEF' type='text' maxLength='2' value='" . $CEF . "' id='cef" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project CEF' type='text' maxLength='2' value='" . $CEF . "' id='cef" . ($i + 1 - $start) . "'></th>" ."\n";
             }
 
             } // fin de si view="planets"
@@ -221,8 +219,8 @@
                 $UdR = $user_building[$i]["UdR"];
                 if ($UdR == "") $UdR = "&nbsp;";
 
-                echo "\t" . "<th><input class='inputOgscalc building current UDR' type='text' maxLength='2'  value='" . $UdR . "' id='udr" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='inputOgscalc building project UDR' type='text' maxLength='2'  value='" . $UdR . "'id='udr" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current UDR' type='text' maxLength='2' value='" . $UdR . "' id='udr" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project UDR' type='text' maxLength='2' value='" . $UdR . "' id='udr" . ($i + 1 - $start) . "'></th>" ."\n";
             }
 
             if($view == "planets") {
@@ -235,8 +233,8 @@
                 $UdN = $user_building[$i]["UdN"];
                 if ($UdN == "") $UdN = "&nbsp;";
 
-                echo "\t" . "<th><input class='inputOgscalc building current UDN' type='text' maxLength='2'  value='" . $UdN . "' id='udn" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='inputOgscalc building project UDN' type='text' maxLength='2'  value='" . $UdN . "' id='udn" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current UDN' type='text' maxLength='2' value='" . $UdN . "' id='udn" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project UDN' type='text' maxLength='2' value='" . $UdN . "' id='udn" . ($i + 1 - $start) . "'></th>" ."\n";
             }
 
             } // fin de si view="planets"
@@ -249,8 +247,8 @@
                 $CSp = $user_building[$i]["CSp"];
                 if ($CSp == "") $CSp = "&nbsp;";
 
-                echo "\t" . "<th><input class='inputOgscalc building current CSP' type='text' maxLength='2'  value='" . $CSp . "' id='csp" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='inputOgscalc building project CSP' type='text' maxLength='2'  value='" . $CSp . "' id='csp" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current CSP' type='text' maxLength='2' value='" . $CSp . "' id='csp" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project CSP' type='text' maxLength='2' value='" . $CSp . "' id='csp" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             ?>
         </tr>
@@ -261,8 +259,8 @@
                 $HM = $user_building[$i]["HM"];
                 if ($HM == "") $HM = "&nbsp;";
 
-                echo "\t" . "<th><input class='inputOgscalc building current HM' type='text' maxLength='2'  value='" . $HM . "' id='hm" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='inputOgscalc building project HM' type='text' maxLength='2'  value='" . $HM . "' id='hm" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current HM' type='text' maxLength='2' value='" . $HM . "' id='hm" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project HM' type='text' maxLength='2' value='" . $HM . "' id='hm" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             ?>
         </tr>
@@ -273,8 +271,8 @@
                 $HC = $user_building[$i]["HC"];
                 if ($HC == "") $HC = "&nbsp;";
 
-                echo "\t" . "<th><input class='inputOgscalc building current HC' type='text' maxLength='2'  value='" . $HC . "' id='hc" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='inputOgscalc building project HC' type='text' maxLength='2'  value='" . $HC . "' id='hc" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current HC' type='text' maxLength='2' value='" . $HC . "' id='hc" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project HC' type='text' maxLength='2' value='" . $HC . "' id='hc" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             ?>
         </tr>
@@ -285,13 +283,13 @@
                 $HD = $user_building[$i]["HD"];
                 if ($HD == "") $HD = "&nbsp;";
 
-                echo "\t" . "<th><input class='inputOgscalc building current HD' type='text' maxLength='2'  value='" . $HD . "' id='hd" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='inputOgscalc building project HD' type='text' maxLength='2'  value='" . $HD . "' id='hd" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current HD' type='text' maxLength='2' value='" . $HD . "' id='hd" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project HD' type='text' maxLength='2' value='" . $HD . "' id='hd" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             ?>
         </tr>
 <?php
-	if($view == "planets") { 
+	if($view == "planets") {
 ?>
         <tr>
             <th><a><?php echo($lang['HOME_EMPIRE_RESEARCHLAB']); ?></a></th>
@@ -301,8 +299,8 @@
                 $Labs[] = intval($Lab);
                 if ($Lab == "") $Lab = "&nbsp;";
 
-                echo "\t" . "<th><input class='inputOgscalc building current LAB' type='text' maxLength='2'  value='" . $Lab . "' id='lab" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='inputOgscalc building project LAB' type='text' maxLength='2'  value='" . $Lab . "' id='lab" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current LAB' type='text' maxLength='2' value='" . $Lab . "' id='lab" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project LAB' type='text' maxLength='2' value='" . $Lab . "' id='lab" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             $maxLab = max($Labs);            
             if ( $server_config['ddr'] == 1 )
@@ -316,8 +314,8 @@
                 $DdR = $user_building[$i]["DdR"];
                 if ($DdR == "") $DdR = "&nbsp;";
 
-                echo "\t" . "<th><input class='inputOgscalc building current DDR' type='text' maxLength='2'  value='" . $DdR . "' id='ddr" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='inputOgscalc building project DDR' type='text' maxLength='2'  value='" . $DdR . "' id='ddr" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current DDR' type='text' maxLength='2' value='" . $DdR . "' id='ddr" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project DDR' type='text' maxLength='2' value='" . $DdR . "' id='ddr" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             }//Fin de si $server_config['ddr']
             ?>
@@ -329,8 +327,8 @@
                 $Ter = $user_building[$i]["Ter"];
                 if ($Ter == "") $Ter = "&nbsp;";
 
-                echo "\t" . "<th><input class='inputOgscalc building current TER' type='text' maxLength='2'  value='" . $Ter . "' id='ter" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='inputOgscalc building project TER' type='text' maxLength='2'  value='" . $Ter . "' id='ter" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current TER' type='text' maxLength='2' value='" . $Ter . "' id='ter" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project TER' type='text' maxLength='2' value='" . $Ter . "' id='ter" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             ?>
         </tr>
@@ -341,8 +339,8 @@
                 $Silo = $user_building[$i]["Silo"];
                 if ($Silo == "") $Silo = "&nbsp;";
 
-                echo "\t" . "<th><input class='inputOgscalc building current SILO' type='text' maxLength='2'  value='" . $Silo . "' id='silo" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='inputOgscalc building project SILO' type='text' maxLength='2'  value='" . $Silo . "' id='silo" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current SILO' type='text' maxLength='2' value='" . $Silo . "' id='silo" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project SILO' type='text' maxLength='2' value='" . $Silo . "' id='silo" . ($i + 1 - $start) . "'></th>" ."\n";
             }
 
             } // fin de si view="planets"
@@ -356,8 +354,8 @@
                 $BaLu = $user_building[$i]["BaLu"];
                 if ($BaLu == "") $BaLu = "&nbsp;";
 
-                echo "\t" . "<th><input class='inputOgscalc building current BALU' type='text' maxLength='2'  value='" . $BaLu . "' id='balu" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='inputOgscalc building project BALU' type='text' maxLength='2'  value='" . $BaLu . "' id='balu" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current BALU' type='text' maxLength='2' value='" . $BaLu . "' id='balu" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project BALU' type='text' maxLength='2' value='" . $BaLu . "' id='balu" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             ?>
         </tr>
@@ -368,8 +366,8 @@
                 $Pha = $user_building[$i]["Pha"];
                 if ($Pha == "") $Pha = "&nbsp;";
 
-                echo "\t" . "<th><input class='inputOgscalc building current PHA' type='text' maxLength='2'  value='" . $Pha . "' id='pha" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='inputOgscalc building project PHA' type='text' maxLength='2'  value='" . $Pha . "' id='pha" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current PHA' type='text' maxLength='2' value='" . $Pha . "' id='pha" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project PHA' type='text' maxLength='2' value='" . $Pha . "' id='pha" . ($i + 1 - $start) . "'></th>" ."\n";
             }
             ?>
         </tr>
@@ -380,8 +378,8 @@
                 $PoSa = $user_building[$i]["PoSa"];
                 if ($PoSa == "") $PoSa = "&nbsp;";
 
-                echo "\t" . "<th><input class='inputOgscalc building current POSA' type='text' maxLength='2'  value='" . $PoSa . "' id='posa" . ($i + 1 - $start) . "'></th>" .
-                "<th><input class='inputOgscalc building project POSA' type='text' maxLength='2'  value='" . $PoSa . "' id='posa" . ($i + 1 - $start) . "'></th>" ."\n";
+                echo "\t" . "<th><input class='inputOgscalc building current POSA' type='text' maxLength='2' value='" . $PoSa . "' id='posa" . ($i + 1 - $start) . "'></th>" .
+                "<th><input class='inputOgscalc building project POSA' type='text' maxLength='2' value='" . $PoSa . "' id='posa" . ($i + 1 - $start) . "'></th>" ."\n";
             }
 
             } // fin de sinon view="planets"
@@ -420,7 +418,7 @@
                 if ($Sat == "") $Sat = "&nbsp;";
                 else $Sat = number_format($Sat, 0, ',', '');
 
-                echo "\t" . "<th><input type='text' maxLength='12' class='inputOgscalc divers current Sat' id='6" . ($i + 1 - $start) . "' value='" . $Sat . "'></th>" .
+                echo "\t" . "<th><input type='text' maxLength='12' class='inputOgscalc divers current Sat' value='" . $Sat . "' id='6" . ($i + 1 - $start) . "'></th>" .
                 "<th><input type='text' maxLength='12' class='inputOgscalc divers project Sat' value='" . $Sat . "' id='6" . ($i + 1 - $start) . "' ></th>" ."\n";
             }            
             ?>
