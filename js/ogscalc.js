@@ -361,8 +361,8 @@ function objectifs() {
         	}
 
         	if( project[i].classList.contains( 'divers' ) ) {
-        		//function in weaponsCosts.js
-        		let divers = diversCosts( project[i] );
+
+				let divers = diversCosts( project[i] );
 				costProjectDiversM += divers.costProjectDiversM;
 				costProjectDiversC += divers.costProjectDiversC;
 				costProjectDiversD += divers.costProjectDiversD;
@@ -630,5 +630,3 @@ function dotSeparateNumber(val) {
 }
 
 initOGSCalc();
-
-
