@@ -29,3 +29,7 @@
 - Fix typos issues in uninstall.php + define "$mod_uninstall_table" to NULL (no DB created, avoid unexpected results if not supplied)
 - Fix typos error in FR lang file
 - Removed unnecessary files
+
+### OGSCalc V2.0.6
+
+- Use of hyperspace technology to calculate the number of pt/gt
