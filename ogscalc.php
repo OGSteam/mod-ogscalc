@@ -794,7 +794,8 @@
 	<script type="text/javascript">
 		var speedUni = "<?php echo $server_config['speed_uni']; ?>";
 		var IonsLevelUser = "<?php echo $Ions = $user_technology['Ions'] != '' ? $user_technology['Ions'] : '0'; ?>";
-		var RRILevelUser = "<?php echo $Ions = $user_technology['RRI'] != '' ? $user_technology['RRI'] : '0'; ?>";
+        var RRILevelUser = "<?php echo $Ions = $user_technology['RRI'] != '' ? $user_technology['RRI'] : '0'; ?>";
+        var HyperespaceLevelUser = "<?php echo $Ions = $user_technology['Hyp'] != '' ? $user_technology['Hyp'] : '0'; ?>";
 		var view = "<?php echo $view; ?>"; 
         var productionUser = <?php echo json_encode($user_production['reel']); ?>;
         var metalPerHour = parseInt(<?php echo $prodMetal; ?>, 10);
