@@ -2,8 +2,8 @@ var nanitesUser = {};
 var uDRUser = {};
 var cSPUser = {};
 var labUser = 0;
-var capaPT = 5000;
-var capaGT = 25000;
+var capaPT = 5000 + ( 5000 * HyperespaceLevelUser * 0.05 );
+var capaGT = 25000 + ( 25000 * HyperespaceLevelUser * 0.05 );
 
 var metalRate = document.getElementById( "metal_rate" );
 var crystalRate = document.getElementById( "crystal_rate" );
@@ -262,6 +262,7 @@ function keepOnlyNumber( value ) {
 }
 
 function initOGSCalc() {
+
 	getLevelsOfUser();
 	initHtml();
 	showProductionConverted();
