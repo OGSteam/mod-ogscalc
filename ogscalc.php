@@ -37,7 +37,7 @@
 	$user_building = $user_empire["building"];
 	$user_defence = $user_empire["defence"];
 	$user_technology = $user_empire["technology"];
-	$user_production = user_empire_production($user_empire,$user_data);
+	//$user_production = user_empire_production($user_empire,$user_data);
 
 	if (!isset($pub_view) || $pub_view == "") $view = "planets";
 	elseif ($pub_view == "planets" || $pub_view == "moons") $view = $pub_view;
@@ -53,9 +53,9 @@
     $prodDeut = 0;
 
     for ($i = 101; $i <= 101 + $nb_planete - 1; $i++) {
-        $prodMetal += $user_production['reel'][$i]['M'];
-        $prodCrystal += $user_production['reel'][$i]['C'];
-        $prodDeut += $user_production['reel'][$i]['D'];
+        $prodMetal += ogame_production_planet($user_building[$i], $user_technology, $user_data,$server_config)['prod_reel']['M'];
+        $prodCrystal += ogame_production_planet($user_building[$i], $user_technology, $user_data,$server_config)['prod_reel']['C'];
+        $prodDeut += ogame_production_planet($user_building[$i], $user_technology, $user_data,$server_config)['prod_reel']['D'];
     }
 ?>
 	<!-- VIEW  -->
@@ -797,7 +797,6 @@
         var RRILevelUser = "<?php echo $Ions = $user_technology['RRI'] != '' ? $user_technology['RRI'] : '0'; ?>";
         var HyperespaceLevelUser = "<?php echo $Ions = $user_technology['Hyp'] != '' ? $user_technology['Hyp'] : '0'; ?>";
 		var view = "<?php echo $view; ?>"; 
-        var productionUser = <?php echo json_encode($user_production['reel']); ?>;
         var metalPerHour = parseInt(<?php echo $prodMetal; ?>, 10);
         var crystalPerHour = parseInt(<?php echo $prodCrystal; ?>, 10);
         var deutPerHour = parseInt(<?php echo $prodDeut; ?>, 10);
